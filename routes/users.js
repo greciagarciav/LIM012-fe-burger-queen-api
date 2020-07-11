@@ -11,7 +11,7 @@ const {
   getOneUser,
   addUser,
   deleteUser,
-  updateUser
+  updateUser,
 } = require('../controller/users');
 
 const initAdminUser = async (app, next) => {
@@ -21,7 +21,7 @@ const initAdminUser = async (app, next) => {
   }
   try {
     await User.findOne({ email: adminEmail });
-  } catch {
+  } catch (e) {
     new User({
       email: adminEmail,
       password: bcrypt.hashSync(adminPassword, 10),

@@ -107,3 +107,6 @@ Pueden realizar lo siguiente:
 #### CORS
 > Intercambio de recursos de origen cruzado (Cross-origin resource sharing).
 Es un mecanismo que utiliza cabeceras HTTP adicionales para permitir que un user agent obtenga permiso para acceder a recursos seleccionados desde un servidor, en un origen distinto (dominio) al que pertenece.
+#### PAGINACIÓN
+> Cuando el numero de resultados de una consulta es grande, es necesario dividirlo,
+para que la eficiencia (tiempo de carga) y la experiencia de usuario no se negativa.

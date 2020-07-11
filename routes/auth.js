@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config');
 const bcrypt = require('bcrypt');
-const User = require('../database/user-schema');
+const config = require('../config');
+
 const { secret } = config;
+const User = require('../database/user-schema');
 
 /** @module auth */
 module.exports = (app, nextMain) => {
@@ -26,7 +27,6 @@ module.exports = (app, nextMain) => {
     User.findOne({ email }, (err, dbUser) => {
       // TODO: autenticar a la usuarix
       if (err) {
-        console.log('1er error')
         return next(500);
       }
       if (!dbUser) {
@@ -34,10 +34,10 @@ module.exports = (app, nextMain) => {
       }
       if (!bcrypt.compareSync(password, dbUser.password)) {
         return next(403);
-      } 
+      }
       return dbUser;
     }).then((user) => {
-        const token = jwt.sign({
+      const token = jwt.sign({
         uid: user._id,
       }, secret, {
         expiresIn: 60 * 60 * 24
