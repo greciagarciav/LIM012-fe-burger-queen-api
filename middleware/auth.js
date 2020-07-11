@@ -16,6 +16,7 @@ module.exports = (secret) => (req, resp, next) => {
     if (err) {
       return next(403);
     }
+
     const userId = decodedToken.uid;
     User.findOne({ _id: userId }).then((user) => {
       req.headers.user = user;
@@ -23,6 +24,7 @@ module.exports = (secret) => (req, resp, next) => {
     }).catch(() => {
       next(403);
     });
+
     // TODO: Verificar identidad del usuario usando `decodeToken.uid`
   });
 };

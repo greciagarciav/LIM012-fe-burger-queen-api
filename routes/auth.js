@@ -17,7 +17,7 @@ module.exports = (app, nextMain) => {
    * @response {String} resp.token Token a usar para los requests sucesivos
    * @code {200} si la autenticación es correcta
    * @code {400} si no se proveen `email` o `password` o ninguno de los dos
-   * @auth No requiere autenticación
+   * @auth No requiere autenticación, comprender mejor esta parte
    */
   app.post('/auth', (req, resp, next) => {
     const { email, password } = req.body;
@@ -40,7 +40,7 @@ module.exports = (app, nextMain) => {
       const token = jwt.sign({
         uid: user._id,
       }, secret, {
-        expiresIn: 60 * 60 * 24
+        expiresIn: 60 * 60 * 24,
       });
       resp.json({
         auth: true,
