@@ -10,7 +10,7 @@ module.exports = {
       if (err) {
         return next(500);
       }
-      resp.setHeader('Link', pagination);
+      // resp.setHeader('Link', pagination);
       return resp.status(200).json(users);
     });
   },
