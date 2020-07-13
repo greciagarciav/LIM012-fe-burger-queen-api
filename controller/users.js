@@ -6,26 +6,26 @@ module.exports = {
   getUsers: (req, resp, next) => {
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
-    User.paginate({}, { select: '-password', page, limit }, (err, users) => {
+    return User.paginate({}, { select: '-password', page, limit }, (err, users) => {
       if (err) {
         return next(500);
       }
       // resp.setHeader('Link', pagination);
-      return resp.status(200).json(users);
+      return resp.status(200).json(users.docs);
     });
   },
   getOneUser: (req, resp, next) => {
     const { uid } = req.params;
     const field = uid.match(/@/g) ? 'email' : '_id';
     if (!userAllowed(req)) { return next(403); }
-    User.findOne({ [field]: uid }, { password: 0 }, (err, dbUser) => {
+    return User.findOne({ [field]: uid }, { password: 0 }, (err, dbUser) => {
       if (err || !dbUser) {
         return next(404);
       }
       return resp.status(200).json(dbUser);
     });
   },
-  addUser: (req, resp, next) => {
+  addUser: async (req, resp, next) => {
     const { email, password, roles } = req.body;
     if (!email || !password) {
       return next(400);
@@ -40,16 +40,16 @@ module.exports = {
       password: bcrypt.hashSync(password, 10),
       roles,
     });
-    user.save((err, newUser) => {
-      if (err) {
-        return next(400);
-      }
+    try {
+      const savedUser = await user.save();
       return resp.status(200).json({
-        _id: newUser._id,
+        _id: savedUser._id,
         email,
         roles,
       });
-    });
+    } catch (e) {
+      return next(400);
+    }
   },
   updateUser: async (req, resp, next) => {
     const { uid } = req.params;
@@ -66,8 +66,9 @@ module.exports = {
       return next(400);
     }
     try {
+      const fieldEditedValue = field === 'email' ? email : uid;
       await User.updateOne({ [field]: uid }, req.body);
-      const doc = await User.findOne({ [field]: uid }, { password: 0 });
+      const doc = await User.findOne({ [field]: fieldEditedValue }, { password: 0 });
       if (!doc) {
         throw new Error('not found');
       }
