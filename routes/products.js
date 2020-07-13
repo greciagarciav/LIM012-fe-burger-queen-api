@@ -6,8 +6,8 @@ const {
   getProducts,
   getOneProduct,
   addProduct,
-  deleteProduct,
   updateProduct,
+  deleteProduct,
 } = require('../controller/products');
 
 /** @module products */

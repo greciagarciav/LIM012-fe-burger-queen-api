@@ -15,6 +15,9 @@ const usersSchema = new Schema({
   },
   roles: {
     type: Object,
+    default: {
+      admin: false,
+    },
   },
 });
 // se agrera el plugin de validacion unica y exportamos el schema

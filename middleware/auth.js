@@ -30,25 +30,21 @@ module.exports = (secret) => (req, resp, next) => {
 };
 
 
-module.exports.isAuthenticated = (req) => (
-  // TODO: decidir por la informacion del request si la usuaria esta autenticada
-  req.headers.user ? true : false
-);
+// TODO: decidir por la informacion del request si la usuaria esta autenticada
+module.exports.isAuthenticated = (req) => (req.headers.user);
 
 
-module.exports.isAdmin = (req) => (
-  // TODO: decidir por la informacion del request si la usuaria es admin
-  req.headers.user.roles.admin
-);
+// TODO: decidir por la informacion del request si la usuaria es admin
+module.exports.isAdmin = (req) => (req.headers.user.roles.admin);
 
-module.exports.userAllowed = (req) => {
+module.exports.userAllowed = (req, resp, next) => {
   const currentUser = req.headers.user;
   const { uid } = req.params;
   const field = uid.match(/@/g) ? 'email' : '_id';
   if (currentUser.roles.admin && currentUser[field] === uid) {
-    return false;
+    return next(403);
   }
-  return true;
+  return next();
 };
 
 module.exports.requireAuth = (req, resp, next) => (

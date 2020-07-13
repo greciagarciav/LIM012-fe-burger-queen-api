@@ -19,35 +19,26 @@ module.exports = (app, nextMain) => {
    * @code {400} si no se proveen `email` o `password` o ninguno de los dos
    * @auth No requiere autenticación, comprender mejor esta parte
    */
-  app.post('/auth', (req, resp, next) => {
+  app.post('/auth', async (req, resp, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
       return next(400);
     }
-    User.findOne({ email }, (err, dbUser) => {
-      // TODO: autenticar a la usuarix
-      if (err) {
-        return next(500);
+    try {
+      const user = await User.findOne({ email });
+      if (!user) return next(404);
+      if (user && bcrypt.compareSync(password, user.password)) {
+        const token = jwt.sign({
+          uid: user._id,
+        }, secret, {
+          expiresIn: 60 * 60 * 24,
+        });
+        return resp.json({ token });
       }
-      if (!dbUser) {
-        return next(404);
-      }
-      if (!bcrypt.compareSync(password, dbUser.password)) {
-        return next(403);
-      }
-      return dbUser;
-    }).then((user) => {
-      const token = jwt.sign({
-        uid: user._id,
-      }, secret, {
-        expiresIn: 60 * 60 * 24,
-      });
-      resp.json({
-        auth: true,
-        user,
-        token,
-      });
-    }).catch(() => next(500));
+      return next(403);
+    } catch (e) {
+      return next(500);
+    }
   });
 
   return nextMain();

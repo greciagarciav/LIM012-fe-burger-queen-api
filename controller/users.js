@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const User = require('../database/user-schema');
-const { userAllowed } = require('../middleware/auth');
 
 module.exports = {
   getUsers: (req, resp, next) => {
@@ -17,16 +16,18 @@ module.exports = {
   getOneUser: (req, resp, next) => {
     const { uid } = req.params;
     const field = uid.match(/@/g) ? 'email' : '_id';
-    if (!userAllowed(req)) { return next(403); }
     return User.findOne({ [field]: uid }, { password: 0 }, (err, dbUser) => {
-      if (err || !dbUser) {
+      if (err) {
+        return next(500);
+      }
+      if (!dbUser) {
         return next(404);
       }
       return resp.status(200).json(dbUser);
     });
   },
   addUser: async (req, resp, next) => {
-    const { email, password, roles } = req.body;
+    const { email, password } = req.body;
     if (!email || !password) {
       return next(400);
     }
@@ -35,26 +36,22 @@ module.exports = {
         return next(403);
       }
     });
-    const user = new User({
-      email,
-      password: bcrypt.hashSync(password, 10),
-      roles,
-    });
+    req.body.password = bcrypt.hashSync(password, 10);
+    const user = new User(req.body);
     try {
       const savedUser = await user.save();
       return resp.status(200).json({
         _id: savedUser._id,
         email,
-        roles,
+        roles: savedUser.roles,
       });
     } catch (e) {
-      return next(400);
+      return next(500);
     }
   },
   updateUser: async (req, resp, next) => {
     const { uid } = req.params;
     const { email, password, roles } = req.body;
-    if (!userAllowed(req)) { return next(403); }
     const field = uid.match(/@/g) ? 'email' : '_id';
     const userIsAdminField = req.headers.user.roles.admin;
     if (roles) {
@@ -66,6 +63,7 @@ module.exports = {
       return next(400);
     }
     try {
+      req.body.password = bcrypt.hashSync(password, 10);
       const fieldEditedValue = field === 'email' ? email : uid;
       await User.updateOne({ [field]: uid }, req.body);
       const doc = await User.findOne({ [field]: fieldEditedValue }, { password: 0 });
@@ -79,19 +77,16 @@ module.exports = {
   },
   deleteUser: async (req, resp, next) => {
     const { uid } = req.params;
-    if (!userAllowed(req)) {
-      return next(403);
-    }
     const field = uid.match(/@/g) ? 'email' : '_id';
     try {
       const doc = await User.findOne({ [field]: uid }, { password: 0 });
       if (!doc) {
-        throw new Error('not found');
+        return next(404);
       }
       await User.deleteOne({ [field]: uid });
       return resp.status(200).json(doc);
     } catch (e) {
-      return next(404);
+      return next(500);
     }
   },
 };

@@ -1,3 +1,7 @@
+const mongoose = require('mongoose');
+const { MockMongoose } = require('mock-mongoose');
+
+const mockMongoose = new MockMongoose(mongoose);
 const bcrypt = require('bcrypt');
 const {
   getUsers,
@@ -12,7 +16,7 @@ const User = require('../../database/user-schema');
 // npx jest --testEnvironment=node --runInBand --detectOpenHandles -t getUsers
 const resp = {
   json: (obj) => obj,
-  status(responseStatus) {
+  status: function status(responseStatus) {
     this.statusCode = responseStatus;
     return this;
   },
@@ -35,21 +39,26 @@ const userData = {
   },
 };
 describe('getUsers', () => {
+  // beforeAll(async () => {
+  //   await connectToDB('mongodb://127.0.0.1/BurguerQueen');
+  //   await new User(userData).save();
+  // });
+  // afterAll(async () => {
+  //   await User.deleteMany();
+  // });
   beforeAll(async () => {
-    await connectToDB('mongodb://127.0.0.1/BurguerQueen');
-    await new User(userData).save();
+    mockMongoose.prepareStorage().then(async () => {
+      await connectToDB('mongodb://127.0.0.1/BurguerQueen');
+      await new User(userData).save();
+    });
   });
-  afterAll(async () => {
-    await User.deleteMany();
+  afterAll(async (done) => {
+    mockMongoose.helper.reset();
+    mongoose.connection.close();
+    done();
   });
-  it('should add a user to the colection', async () => {
-    const result = await addUser(userAddedReq, resp, next);
-    expect(result.email).toBe('test@localhost');
-    expect(result.password).toBeUndefined();
-    expect(result.roles.admin).toBeFalsy();
-    expect(resp.statusCode).toBe(200);
-  });
-  it('should get users collection', async () => {
+  console.log(mockMongoose.helper.isMocked());
+  it('should get users collection', async (done) => {
     const req = {
       query: {},
     };
@@ -61,16 +70,14 @@ describe('getUsers', () => {
     delete result[1]._doc._id;
     delete result[1]._doc.__v;
     const newResult = [result[0]._doc, result[1]._doc];
-    expect(newResult).toEqual([userData, userAddedReq.body]);
+    expect(newResult).toEqual([userAddedReq.body, userData]);
     expect(resp.statusCode).toBe(200);
+    done();
   });
-  it('should get user requested with email: test2@localhost', async () => {
+  it('should get user requested with email: test2@localhost', async (done) => {
     const req = {
       params: {
         uid: 'test2@localhost',
-      },
-      headers: {
-        user: userData,
       },
     };
     const result = await getOneUser(req, resp, next);
@@ -78,8 +85,17 @@ describe('getUsers', () => {
     delete result._doc.__v;
     expect(result._doc).toEqual(userData);
     expect(resp.statusCode).toBe(200);
+    done();
   });
-  it('should edit the user email', async () => {
+  it('should add a user to the colection', async (done) => {
+    const result = await addUser(userAddedReq, resp, next);
+    expect(result.email).toBe('test@localhost');
+    expect(result.password).toBeUndefined();
+    expect(result.roles.admin).toBeFalsy();
+    expect(resp.statusCode).toBe(200);
+    done();
+  });
+  it('should edit the user email', async (done) => {
     const req = {
       body: {
         email: 'newtest@localhost',
@@ -93,13 +109,11 @@ describe('getUsers', () => {
     const result = await updateUser(req, resp, next);
     expect(result.email).toBe('newtest@localhost');
     expect(resp.statusCode).toBe(200);
+    done();
   });
-  it('should delete user requested with email: test2@localhost', async () => {
+  it('should delete user requested with email: test2@localhost', async (done) => {
     const req = {
       params: { uid: 'test2@localhost' },
-      headers: {
-        user: userData,
-      },
     };
     const result = await deleteUser(req, resp, next);
     const userExists = await User.findOne({ email: req.params.uid });
@@ -108,5 +122,6 @@ describe('getUsers', () => {
     expect(result._doc).toEqual(userData);
     expect(userExists).toBeNull();
     expect(resp.statusCode).toBe(200);
+    done();
   });
 });

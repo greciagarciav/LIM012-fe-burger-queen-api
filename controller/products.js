@@ -8,13 +8,16 @@ module.exports = {
       if (err) {
         return next(500);
       }
-      return resp.status(200).json(products);
+      return resp.status(200).json(products.docs);
     });
   },
   getOneProduct: (req, resp, next) => {
     const { productId } = req.params;
     Product.findOne({ _id: productId }, (err, product) => {
-      if (err || !product) {
+      if (err) {
+        return next(500);
+      }
+      if (!product) {
         return next(404);
       }
       return resp.status(200).json(product);
@@ -22,21 +25,15 @@ module.exports = {
   },
   addProduct: (req, resp, next) => {
     const {
-      name, price, type, image, dateEntry,
+      name, price,
     } = req.body;
     if (!name || !price) {
       return next(400);
     }
-    const product = new Product({
-      name,
-      price,
-      type,
-      image,
-      dateEntry,
-    });
+    const product = new Product(req.body);
     product.save((err, newProduct) => {
       if (err) {
-        return next(400);
+        return next(500);
       }
       return resp.status(200).json(newProduct);
     });
@@ -49,7 +46,7 @@ module.exports = {
       await Product.updateOne({ _id: req.params.productId }, req.body);
       const doc = await Product.findOne({ _id: req.params.productId });
       if (!doc) {
-        throw new Error('not found');
+        throw new Error('Not Found');
       }
       return resp.status(200).json(doc);
     } catch (e) {
@@ -60,12 +57,12 @@ module.exports = {
     try {
       const doc = await Product.findOne({ _id: req.params.productId });
       if (!doc) {
-        throw new Error('not found');
+        return next(404);
       }
       await Product.deleteOne({ _id: req.params.productId });
       return resp.status(200).json(doc);
     } catch (e) {
-      return next(404);
+      return next(500);
     }
   },
 };

@@ -4,14 +4,15 @@ const User = require('../database/user-schema');
 const {
   requireAuth,
   requireAdmin,
+  userAllowed,
 } = require('../middleware/auth');
 
 const {
   getUsers,
   getOneUser,
   addUser,
-  deleteUser,
   updateUser,
+  deleteUser,
 } = require('../controller/users');
 
 const initAdminUser = async (app, next) => {
@@ -20,7 +21,10 @@ const initAdminUser = async (app, next) => {
     return next();
   }
   try {
-    await User.findOne({ email: adminEmail });
+    const user = await User.findOne({ email: adminEmail });
+    if (!user) {
+      throw new Error('No user admin yet!');
+    }
   } catch (e) {
     new User({
       email: adminEmail,
@@ -99,7 +103,7 @@ module.exports = (app, next) => {
    * x @code {403} si no es ni admin o la misma usuaria
    * x @code {404} si la usuaria solicitada no existe
    */
-  app.get('/users/:uid', requireAuth, getOneUser);
+  app.get('/users/:uid', requireAuth, userAllowed, getOneUser);
 
   /**
    * @name POST /users
@@ -144,7 +148,7 @@ module.exports = (app, next) => {
    * x @code {403} una usuaria no admin intenta de modificar sus `roles`
    * x @code {404} si la usuaria solicitada no existe
    */
-  app.put('/users/:uid', requireAuth, updateUser);
+  app.put('/users/:uid', requireAuth, userAllowed, updateUser);
 
   /**
    * x @name DELETE /users
@@ -162,7 +166,7 @@ module.exports = (app, next) => {
    * x @code {403} si no es ni admin o la misma usuaria
    * x @code {404} si la usuaria solicitada no existe
    */
-  app.delete('/users/:uid', requireAuth, deleteUser);
+  app.delete('/users/:uid', requireAuth, userAllowed, deleteUser);
 
   initAdminUser(app, next);
 };
