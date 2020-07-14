@@ -75,7 +75,7 @@ module.exports = (app, nextMain) => {
    * x @code {400} si no se indican `name` o `price`
    * x @code {401} si no hay cabecera de autenticación
    * x @code {403} si no es admin
-   * x @code {404} si el producto con `productId` indicado no existe
+   * xxxxxx @code {404} si el producto con `productId` indicado no existe
    */
   app.post('/products', requireAdmin, addProduct);
 
@@ -101,7 +101,7 @@ module.exports = (app, nextMain) => {
    * x @code {400} si no se indican ninguna propiedad a modificar
    * x @code {401} si no hay cabecera de autenticación
    * x @code {403} si no es admin
-   * x @code {404} si el producto con `productId` indicado no existe
+   * xxxxx @code {404} si el producto con `productId` indicado no existe
    */
   app.put('/products/:productId', requireAdmin, updateProduct);
 
@@ -121,7 +121,7 @@ module.exports = (app, nextMain) => {
    * x @code {200} si la autenticación es correcta
    * x @code {401} si no hay cabecera de autenticación
    * x @code {403} si no es ni admin
-   * x @code {404} si el producto con `productId` indicado no existe
+   * xxxxx @code {404} si el producto con `productId` indicado no existe
    */
   app.delete('/products/:productId', requireAdmin, deleteProduct);
 

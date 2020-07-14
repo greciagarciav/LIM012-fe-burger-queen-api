@@ -16,7 +16,7 @@ const User = require('../../database/user-schema');
 // npx jest --testEnvironment=node --runInBand --detectOpenHandles -t getUsers
 const resp = {
   json: (obj) => obj,
-  status: function status(responseStatus) {
+  status(responseStatus) {
     this.statusCode = responseStatus;
     return this;
   },
@@ -30,7 +30,18 @@ const userAddedReq = {
     },
   },
 };
-const next = (number) => number;
+const failedReq = {
+  body: {
+    email: 'error@localhost',
+  },
+  params: {
+    uid: 'error@localhost',
+  },
+};
+const next = (number) => {
+  resp.statusCode = number;
+  return number;
+};
 const userData = {
   email: 'test2@localhost',
   password: bcrypt.hashSync('', 10),
@@ -39,13 +50,6 @@ const userData = {
   },
 };
 describe('getUsers', () => {
-  // beforeAll(async () => {
-  //   await connectToDB('mongodb://127.0.0.1/BurguerQueen');
-  //   await new User(userData).save();
-  // });
-  // afterAll(async () => {
-  //   await User.deleteMany();
-  // });
   beforeAll(async () => {
     mockMongoose.prepareStorage().then(async () => {
       await connectToDB('mongodb://127.0.0.1/BurguerQueen');
@@ -57,7 +61,19 @@ describe('getUsers', () => {
     mongoose.connection.close();
     done();
   });
-  console.log(mockMongoose.helper.isMocked());
+  it('should add a user to the colection', async (done) => {
+    const result = await addUser(userAddedReq, resp, next);
+    expect(result.email).toBe('test@localhost');
+    expect(result.password).toBeUndefined();
+    expect(result.roles.admin).toBeFalsy();
+    expect(resp.statusCode).toBe(200);
+    done();
+  });
+  it('should not add a user to the colection and return 400', async (done) => {
+    await addUser(failedReq, resp, next);
+    expect(resp.statusCode).toBe(400);
+    done();
+  });
   it('should get users collection', async (done) => {
     const req = {
       query: {},
@@ -87,12 +103,14 @@ describe('getUsers', () => {
     expect(resp.statusCode).toBe(200);
     done();
   });
-  it('should add a user to the colection', async (done) => {
-    const result = await addUser(userAddedReq, resp, next);
-    expect(result.email).toBe('test@localhost');
-    expect(result.password).toBeUndefined();
-    expect(result.roles.admin).toBeFalsy();
-    expect(resp.statusCode).toBe(200);
+  it('should not get user requested with email: unknown@localhost and return 404', async (done) => {
+    const req = {
+      params: {
+        uid: 'unknown@localhost',
+      },
+    };
+    await getOneUser(req, resp, next);
+    expect(resp.statusCode).toBe(404);
     done();
   });
   it('should edit the user email', async (done) => {
@@ -111,6 +129,11 @@ describe('getUsers', () => {
     expect(resp.statusCode).toBe(200);
     done();
   });
+  it('should not edit the user and return 400', async (done) => {
+    await updateUser(failedReq, resp, next);
+    expect(resp.statusCode).toBe(400);
+    done();
+  });
   it('should delete user requested with email: test2@localhost', async (done) => {
     const req = {
       params: { uid: 'test2@localhost' },
@@ -122,6 +145,11 @@ describe('getUsers', () => {
     expect(result._doc).toEqual(userData);
     expect(userExists).toBeNull();
     expect(resp.statusCode).toBe(200);
+    done();
+  });
+  it('should not edit the user and return 404', async (done) => {
+    await deleteUser(failedReq, resp, next);
+    expect(resp.statusCode).toBe(404);
     done();
   });
 });

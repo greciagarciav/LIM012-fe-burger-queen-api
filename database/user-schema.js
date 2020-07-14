@@ -8,10 +8,19 @@ const usersSchema = new Schema({
     type: String,
     unique: true,
     required: [true, 'Email is necessary'],
+    validate: {
+      validator: (v) => /@/g.test(v),
+      message: (props) => `${props.value} is not a valid Email!`,
+    },
   },
   password: {
     type: String,
     required: [true, 'Password is necessary'],
+    min: [5, 'Password is too weak'],
+    validate: {
+      validator: (v) => v.length >= 5,
+      message: (props) => `${props.value} is not a valid Password!`,
+    },
   },
   roles: {
     type: Object,

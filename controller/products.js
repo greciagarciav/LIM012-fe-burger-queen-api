@@ -14,6 +14,9 @@ module.exports = {
   getOneProduct: (req, resp, next) => {
     const { productId } = req.params;
     Product.findOne({ _id: productId }, (err, product) => {
+      if (err.kind === 'ObjectId') {
+        return next(400);
+      }
       if (err) {
         return next(500);
       }

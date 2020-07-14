@@ -41,10 +41,10 @@ module.exports.userAllowed = (req, resp, next) => {
   const currentUser = req.headers.user;
   const { uid } = req.params;
   const field = uid.match(/@/g) ? 'email' : '_id';
-  if (currentUser.roles.admin && currentUser[field] === uid) {
-    return next(403);
+  if (currentUser.roles.admin || currentUser[field] === uid) {
+    return next();
   }
-  return next();
+  return next(403);
 };
 
 module.exports.requireAuth = (req, resp, next) => (

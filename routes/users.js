@@ -92,7 +92,8 @@ module.exports = (app, next) => {
    * x @description Obtiene información de una usuaria
    * x @path {GET} /users/:uid
    * x @params {String} :uid `id` o `email` de la usuaria a consultar
-   * x @auth Requiere `token` de autenticación y que la usuaria sea **admin** o la usuaria a consultar
+   * x @auth Requiere `token` de autenticación
+   *   y que la usuaria sea **admin** o la usuaria a consultar
    * x @response {Object} user
    * x @response {String} user._id
    * x @response {Object} user.email
@@ -135,7 +136,8 @@ module.exports = (app, next) => {
    * x @body {String} password Contraseña
    * x @body {Object} [roles]
    * x @body {Boolean} [roles.admin]
-   * x @auth Requiere `token` de autenticación y que la usuaria sea **admin** o la usuaria a modificar
+   * x @auth Requiere `token` de autenticación
+   *   y que la usuaria sea **admin** o la usuaria a modificar
    * x @response {Object} user
    * x @response {String} user._id
    * x @response {Object} user.email
@@ -155,7 +157,8 @@ module.exports = (app, next) => {
    * x @description Elimina una usuaria
    * x @params {String} :uid `id` o `email` de la usuaria a modificar
    * x @path {DELETE} /users
-   * x @auth Requiere `token` de autenticación y que la usuaria sea **admin** o la usuaria a eliminar
+   * x @auth Requiere `token` de autenticación
+   *   y que la usuaria sea **admin** o la usuaria a eliminar
    * x @response {Object} user
    * x @response {String} user._id
    * x @response {Object} user.email

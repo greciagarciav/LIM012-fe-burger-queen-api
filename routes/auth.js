@@ -33,7 +33,7 @@ module.exports = (app, nextMain) => {
         }, secret, {
           expiresIn: 60 * 60 * 24,
         });
-        return resp.json({ token });
+        return resp.status(200).json({ token });
       }
       return next(403);
     } catch (e) {
