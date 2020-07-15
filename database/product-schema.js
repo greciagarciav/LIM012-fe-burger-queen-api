@@ -9,7 +9,7 @@ const productsSchema = new Schema({
     required: [true, 'A name is necessary'],
   },
   price: {
-    type: String,
+    type: Number,
     required: [true, 'A price is necessary'],
   },
   type: {

@@ -1,27 +1,29 @@
 const Product = require('../database/product-schema');
+const { paginate } = require('./pagination');
 
 module.exports = {
   getProducts: (req, resp, next) => {
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
-    Product.paginate({}, { page, limit }, (err, products) => {
+    return Product.paginate({}, { page, limit }, (err, products) => {
       if (err) {
         return next(500);
+      }
+      const pagination = paginate(req, page, limit, products);
+      if (pagination) {
+        resp.setHeader('link', pagination);
       }
       return resp.status(200).json(products.docs);
     });
   },
   getOneProduct: (req, resp, next) => {
     const { productId } = req.params;
-    Product.findOne({ _id: productId }, (err, product) => {
-      if (err.kind === 'ObjectId') {
-        return next(400);
+    return Product.findOne({ _id: productId }, (err, product) => {
+      if ((err && err.kind === 'ObjectId') || !product) {
+        return next(404);
       }
       if (err) {
         return next(500);
-      }
-      if (!product) {
-        return next(404);
       }
       return resp.status(200).json(product);
     });
@@ -34,7 +36,10 @@ module.exports = {
       return next(400);
     }
     const product = new Product(req.body);
-    product.save((err, newProduct) => {
+    return product.save((err, newProduct) => {
+      if (err && err._message === 'Products validation failed') {
+        return next(400);
+      }
       if (err) {
         return next(500);
       }
@@ -49,11 +54,17 @@ module.exports = {
       await Product.updateOne({ _id: req.params.productId }, req.body);
       const doc = await Product.findOne({ _id: req.params.productId });
       if (!doc) {
-        throw new Error('Not Found');
+        return next(404);
       }
       return resp.status(200).json(doc);
     } catch (e) {
-      return next(404);
+      if (e.kind === 'ObjectId') {
+        return next(404);
+      }
+      if (e._message === 'Validation failed' || e.kind === 'date') {
+        return next(400);
+      }
+      return next(400);
     }
   },
   deleteProduct: async (req, resp, next) => {
@@ -65,6 +76,9 @@ module.exports = {
       await Product.deleteOne({ _id: req.params.productId });
       return resp.status(200).json(doc);
     } catch (e) {
+      if (e.kind === 'ObjectId') {
+        return next(404);
+      }
       return next(500);
     }
   },

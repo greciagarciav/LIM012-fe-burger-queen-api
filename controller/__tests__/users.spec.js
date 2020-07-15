@@ -86,7 +86,7 @@ describe('getUsers', () => {
     delete result[1]._doc._id;
     delete result[1]._doc.__v;
     const newResult = [result[0]._doc, result[1]._doc];
-    expect(newResult).toEqual([userAddedReq.body, userData]);
+    expect(newResult).toEqual([userData, userAddedReq.body]);
     expect(resp.statusCode).toBe(200);
     done();
   });
@@ -129,9 +129,9 @@ describe('getUsers', () => {
     expect(resp.statusCode).toBe(200);
     done();
   });
-  it('should not edit the user and return 400', async (done) => {
+  it('should not edit the user and return 404', async (done) => {
     await updateUser(failedReq, resp, next);
-    expect(resp.statusCode).toBe(400);
+    expect(resp.statusCode).toBe(404);
     done();
   });
   it('should delete user requested with email: test2@localhost', async (done) => {
