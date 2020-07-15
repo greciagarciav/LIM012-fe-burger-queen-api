@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const bcrypt = require('bcrypt');
 const User = require('../database/user-schema');
 const { paginate } = require('./pagination');
@@ -12,7 +11,9 @@ module.exports = {
         return next(500);
       }
       const pagination = paginate(req, page, limit, users);
-      resp.setHeader('link', pagination);
+      if (pagination) {
+        resp.setHeader('link', pagination);
+      }
       return resp.status(200).json(users.docs);
     });
   },
@@ -36,7 +37,6 @@ module.exports = {
       return next(403);
     }
     if (password.length < 5) {
-      console.log(password);
       return next(400);
     }
     req.body.password = bcrypt.hashSync(password, 10);
@@ -49,7 +49,6 @@ module.exports = {
         roles: savedUser.roles,
       });
     } catch (e) {
-      console.log(e);
       if (e._message === 'Users validation failed') {
         return next(400);
       }
@@ -64,21 +63,25 @@ module.exports = {
     if (!userExists) {
       return next(404);
     }
-    const userIsAdminField = req.headers.user.roles.admin;
+    const userData = req.headers.user;
     if (roles) {
-      if (!userIsAdminField && roles.admin !== userIsAdminField) {
+      if (!userData.roles.admin && roles.admin !== userData.roles.admin) {
         return next(403);
       }
     }
     if (!email && !password) {
       return next(400);
     }
-    if (password.length < 5) {
+    if (password && password.length < 5) {
       return next(400);
     }
-    try {
-      req.body.password = bcrypt.hashSync(password, 10);
+    if (email && email === userData.email) {
       delete req.body.email;
+    }
+    if (password) {
+      req.body.password = bcrypt.hashSync(password, 10);
+    }
+    try {
       const doc = await User.findOneAndUpdate({ [field]: uid }, req.body, {
         new: true,
         runValidators: true,

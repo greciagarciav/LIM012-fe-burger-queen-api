@@ -1,7 +1,9 @@
+const { port } = require('../config');
+
 module.exports.paginate = (req, page, limit, collection) => {
-  const ip = req.ip ? req.ip : '';
-  const fullUrl = `<${req.protocol}://${req.hostname}${ip}${req.path}`;
-  let pagination;
+  const actualPort = `:${port}` || '';
+  const fullUrl = `<${req.protocol}://${req.hostname}${actualPort}${req.path}`;
+  let pagination = '';
   if (parseInt(page, 10) !== 1) {
     pagination += `${fullUrl}?page=1&limit=${limit}>; rel="first",`;
   }
@@ -14,5 +16,5 @@ module.exports.paginate = (req, page, limit, collection) => {
   if (collection.hasPrevPage) {
     pagination += `${fullUrl}?page=${collection.prevPage}&limit=${limit}>; rel="prev",`;
   }
-  return pagination;
+  return pagination.slice(0, -1);
 };
