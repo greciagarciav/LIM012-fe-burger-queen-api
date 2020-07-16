@@ -22,6 +22,7 @@ module.exports = {
     const field = uid.match(/@/g) ? 'email' : '_id';
     return User.findOne({ [field]: uid }, { password: 0 }, (err, dbUser) => {
       if (err || !dbUser) {
+        console.log('entre');
         return next(404);
       }
       return resp.status(200).json(dbUser);

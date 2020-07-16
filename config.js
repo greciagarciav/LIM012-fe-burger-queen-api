@@ -3,3 +3,4 @@ exports.dbUrl = process.env.DB_URL || 'mongodb+srv://FiorellaChilcon:Laboratoria
 exports.secret = process.env.JWT_SECRET || 'esta-es-la-api-burger-queen';
 exports.adminEmail = process.env.ADMIN_EMAIL || 'admin@localhost';
 exports.adminPassword = process.env.ADMIN_PASSWORD || 'changeme';
+// definir propiedades: export PORT=8888
