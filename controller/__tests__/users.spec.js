@@ -13,7 +13,6 @@ const {
 const { connectToDB } = require('../../database/db-connect');
 const User = require('../../database/user-schema');
 // npx jest -t getUsers
-// npx jest --testEnvironment=node --runInBand --detectOpenHandles -t getUsers
 const resp = {
   json: (obj) => obj,
   status(responseStatus) {
@@ -38,10 +37,7 @@ const failedReq = {
     uid: 'error@localhost',
   },
 };
-const next = (number) => {
-  resp.statusCode = number;
-  return number;
-};
+const next = (number) => number;
 const userData = {
   email: 'test2@localhost',
   password: bcrypt.hashSync('', 10),
@@ -49,29 +45,28 @@ const userData = {
     admin: false,
   },
 };
-describe('getUsers', () => {
-  beforeAll(async () => {
-    mockMongoose.prepareStorage().then(async () => {
-      await connectToDB('mongodb://127.0.0.1/BurguerQueen');
-      await new User(userData).save();
+describe('Users', () => {
+  beforeAll((done) => {
+    mockMongoose.prepareStorage().then(() => {
+      connectToDB('mongodb://127.0.0.1/BurguerQueen').then(() => {
+        new User(userData).save((err, result) => {
+          if (result) {
+            done();
+          }
+        });
+      });
     });
-  });
-  afterAll(async (done) => {
-    mockMongoose.helper.reset();
-    mongoose.connection.close();
-    done();
   });
   it('should add a user to the colection', async (done) => {
     const result = await addUser(userAddedReq, resp, next);
     expect(result.email).toBe('test@localhost');
     expect(result.password).toBeUndefined();
     expect(result.roles.admin).toBeFalsy();
-    expect(resp.statusCode).toBe(200);
     done();
   });
   it('should not add a user to the colection and return 400', async (done) => {
-    await addUser(failedReq, resp, next);
-    expect(resp.statusCode).toBe(400);
+    const result = await addUser(failedReq, resp, next);
+    expect(result).toBe(400);
     done();
   });
   it('should get users collection', async (done) => {
@@ -87,7 +82,6 @@ describe('getUsers', () => {
     delete result[1]._doc.__v;
     const newResult = [result[0]._doc, result[1]._doc];
     expect(newResult).toEqual([userData, userAddedReq.body]);
-    expect(resp.statusCode).toBe(200);
     done();
   });
   it('should get user requested with email: test2@localhost', async (done) => {
@@ -100,7 +94,6 @@ describe('getUsers', () => {
     delete result._doc._id;
     delete result._doc.__v;
     expect(result._doc).toEqual(userData);
-    expect(resp.statusCode).toBe(200);
     done();
   });
   it('should not get user requested with email: unknown@localhost and return 404', async (done) => {
@@ -109,8 +102,8 @@ describe('getUsers', () => {
         uid: 'unknown@localhost',
       },
     };
-    await getOneUser(req, resp, next);
-    expect(resp.statusCode).toBe(404);
+    const result = await getOneUser(req, resp, next);
+    expect(result).toBe(404);
     done();
   });
   it('should edit the user email', async (done) => {
@@ -126,12 +119,11 @@ describe('getUsers', () => {
     };
     const result = await updateUser(req, resp, next);
     expect(result.email).toBe('newtest@localhost');
-    expect(resp.statusCode).toBe(200);
     done();
   });
   it('should not edit the user and return 404', async (done) => {
-    await updateUser(failedReq, resp, next);
-    expect(resp.statusCode).toBe(404);
+    const result = await updateUser(failedReq, resp, next);
+    expect(result).toBe(404);
     done();
   });
   it('should delete user requested with email: test2@localhost', async (done) => {
@@ -144,12 +136,16 @@ describe('getUsers', () => {
     delete result._doc.__v;
     expect(result._doc).toEqual(userData);
     expect(userExists).toBeNull();
-    expect(resp.statusCode).toBe(200);
     done();
   });
   it('should not edit the user and return 404', async (done) => {
-    await deleteUser(failedReq, resp, next);
-    expect(resp.statusCode).toBe(404);
+    const result = await deleteUser(failedReq, resp, next);
+    expect(result).toBe(404);
+    done();
+  });
+  afterAll(async (done) => {
+    await mockMongoose.helper.reset();
+    await mockMongoose.killMongo();
     done();
   });
 });
