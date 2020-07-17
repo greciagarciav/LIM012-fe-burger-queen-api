@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 // npx jest -t getUsers
 const mongoose = require('mongoose');
 const { MockMongoose } = require('mock-mongoose');
@@ -15,6 +14,7 @@ const {
   deleteUser,
   updateUser,
 } = require('../../controller/users');
+const { connectToDB } = require('../../database/db-connect');
 
 // Mock Express Arguments
 const resp = {
@@ -55,21 +55,20 @@ const userData = {
   },
 };
 describe('Users', () => {
-  // beforeAll((done) => {
-  //   mockMongoose.prepareStorage().then(() => {
-  //     mongoose.connect('mongodb://127.0.0.1/BurguerQueen');
-  //     mongoose.connection.on('connected', async () => {
-  //       const req = {
-  //         body: userData,
-  //       };
-  //       console.log('db connection is now open');
-  //       const result = await addUser(req, resp, next);
-  //       if (result) {
-  //         done();
-  //       }
-  //     });
-  //   });
-  // });
+  beforeAll((done) => {
+    mockMongoose.prepareStorage().then(() => {
+      connectToDB('mongodb://127.0.0.1/BurguerQueen');
+      mongoose.connection.on('connected', async () => {
+        const req = {
+          body: userData,
+        };
+        const result = await addUser(req, resp, next);
+        if (result) {
+          done();
+        }
+      });
+    });
+  });
   it('should add a user to the colection', async () => {
     const result = await addUser(userAddedReq, resp, next);
     expect(result.email).toBe('test@localhost');
@@ -116,7 +115,6 @@ describe('Users', () => {
     const result = await getUsers(req, resp, next);
     delete result[0]._doc._id;
     delete result[0]._doc.__v;
-    console.log(result);
     expect(result[0]._doc).toEqual(userData);
   });
   it('should get user requested with email: test2@localhost', async () => {
@@ -173,9 +171,8 @@ describe('Users', () => {
     const result = await deleteUser(failedReq, resp, next);
     expect(result).toBe(404);
   });
-  afterAll(async (done) => {
+  afterAll(async () => {
     await mockMongoose.helper.reset();
     await mockMongoose.killMongo();
-    done();
   });
 });

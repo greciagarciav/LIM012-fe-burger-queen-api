@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const mongoose = require('mongoose');
 const { MockMongoose } = require('mock-mongoose');
 
@@ -20,18 +19,20 @@ const resp = {
     this.statusCode = responseStatus;
     return this;
   },
+  setHeader: (name, value) => {
+    this[name] = value;
+  },
 };
 const next = (number) => number;
 describe('Products', () => {
-  // beforeAll((done) => {
-  //   mockMongoose.prepareStorage().then(() => {
-  //     connectToDB('mongodb://127.0.0.1/BurguerQueen');
-  //     mongoose.connection.on('connected', async () => {
-  //       console.log('db connection is now open');
-  //       done();
-  //     });
-  //   });
-  // });
+  beforeAll((done) => {
+    mockMongoose.prepareStorage().then(() => {
+      connectToDB('mongodb://127.0.0.1/BurguerQueen');
+      mongoose.connection.on('connected', async () => {
+        done();
+      });
+    });
+  });
   it('should add a product, get it and updated it', async () => {
     const req = {
       body: {
@@ -132,14 +133,12 @@ describe('Products', () => {
       },
     };
     const result = await getProducts(req, resp, next);
-    console.log(result);
     expect(result.length).toBe(1);
     expect(result[0].name).toBe('tacos');
     expect(result[0].price).toBe(3);
   });
-  // afterAll(async (done) => {
-  //   await mockMongoose.helper.reset();
-  //   await mockMongoose.killMongo();
-  //   done();
-  // });
+  afterAll(async () => {
+    await mockMongoose.helper.reset();
+    await mockMongoose.killMongo();
+  });
 });
