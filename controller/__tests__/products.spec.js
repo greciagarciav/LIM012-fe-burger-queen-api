@@ -48,7 +48,7 @@ describe('Products', () => {
       });
     });
   });
-  it('should add a product, get it and updated it', async () => {
+  it('should add a product', async () => {
     const req = {
       body: {
         name: 'tacos',
@@ -57,24 +57,14 @@ describe('Products', () => {
       },
     };
     const result = await addProduct(req, resp, next);
-    if (result) {
-      const req2 = {
-        params: {
-          productId: result._doc._id,
-        },
-        body: {
-          price: 12,
-        },
-      };
-      delete result._doc._id;
-      delete result._doc.__v;
-      const product = await getOneProduct(req2, resp, next);
-      expect(result).toBe(req.body);
-      expect(product.name).toBe('tacos');
-      expect(product.price).toBe(3);
-      const productUpdated = await updateProduct(req2, resp, next);
-      expect(productUpdated.price).toBe(12);
-    }
+    expect(result.name).toBe('tacos');
+    expect(result.price).toBe(3);
+    req.params = {
+      productId: result._id,
+    };
+    const product = await getOneProduct(req, resp, next);
+    expect(product.name).toBe('tacos');
+    expect(product.price).toBe(3);
   });
   it('should not add a product when the price is not defined', async () => {
     const req = {
@@ -94,19 +84,17 @@ describe('Products', () => {
     const result = await addProduct(req, resp, next);
     expect(result).toBe(400);
   });
-  it('should not add a product when the price is not a number', (done) => {
+  it('should not add a product when the price is not a number', async () => {
     const req = {
       body: {
         name: 'soda',
         price: 'five',
       },
     };
-    addProduct(req, resp, (num) => {
-      expect(num).toBe(400);
-      done();
-    });
+    const result = await addProduct(req, resp, next);
+    expect(result).toBe(400);
   });
-  it('should not get, delete and update a product when it does not exists', (done) => {
+  it('should not get, delete and update a product when it does not exists', async () => {
     const req = {
       params: {
         productId: 'error',
@@ -115,18 +103,12 @@ describe('Products', () => {
         name: 'test',
       },
     };
-    getOneProduct(req, resp, (num) => {
-      expect(num).toBe(404);
-      done();
-    });
-    deleteProduct(req, resp, (num) => {
-      expect(num).toBe(404);
-      done();
-    });
-    updateProduct(req, resp, (num) => {
-      expect(num).toBe(404);
-      done();
-    });
+    const result = await getOneProduct(req, resp, next);
+    const result2 = await updateProduct(req, resp, next);
+    const result3 = await deleteProduct(req, resp, next);
+    expect(result).toBe(404);
+    expect(result2).toBe(404);
+    expect(result3).toBe(404);
   });
   it('should get all the products', async () => {
     const result = await getProducts(standardReq, resp, next);
@@ -178,16 +160,14 @@ describe('Products', () => {
     expect(result3).toBe(404);
     expect(result4).toBe(400);
   });
-  it('should not update a product when the body is empty', (done) => {
+  it('should not update a product when the body is empty', async () => {
     const req = {
       body: {},
     };
-    updateProduct(req, resp, (num) => {
-      expect(num).toBe(400);
-      done();
-    });
+    const result = await updateProduct(req, resp, next);
+    expect(result).toBe(400);
   });
-  it('should not update or delete a product when ObjectId is wrong', (done) => {
+  it('should not update or delete a product when ObjectId is wrong', async () => {
     const req = {
       params: {
         productId: '5f0f8080ab0857cd368ab972',
@@ -196,16 +176,12 @@ describe('Products', () => {
         price: 16,
       },
     };
-    updateProduct(req, resp, (num) => {
-      expect(num).toBe(404);
-      done();
-    });
-    deleteProduct(req, resp, (num) => {
-      expect(num).toBe(404);
-      done();
-    });
+    const result1 = await updateProduct(req, resp, next);
+    const result2 = await deleteProduct(req, resp, next);
+    expect(result1).toBe(404);
+    expect(result2).toBe(404);
   });
-  it('should delete a product', async (done) => {
+  it('should delete a product', async () => {
     const products = await getProducts(standardReq, resp, next);
     const ids = products.map((item) => item._id);
     const req2 = {
@@ -215,10 +191,8 @@ describe('Products', () => {
     };
     const result = await deleteProduct(req2, resp, next);
     expect(result._doc).toEqual(products[0]._doc);
-    getOneProduct(req2, resp, (num) => {
-      expect(num).toBe(404);
-      done();
-    });
+    const result2 = await getOneProduct(req2, resp, next);
+    expect(result2).toBe(404);
   });
   afterAll(async () => {
     await mockMongoose.helper.reset();

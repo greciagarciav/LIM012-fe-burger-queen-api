@@ -17,17 +17,17 @@ module.exports = {
       return resp.status(200).json(orders.docs);
     });
   },
-  getOneOrder: (req, resp, next) => {
+  getOneOrder: async (req, resp, next) => {
     const { orderId } = req.params;
-    return Order.findOne({ _id: orderId }, (err, order) => {
-      if ((err && err.kind === 'ObjectId') || !order) {
-        return next(404);
+    try {
+      const doc = await Order.findOne({ _id: orderId });
+      if (!doc) {
+        throw new Error('Not Found');
       }
-      if (err) {
-        return next(500);
-      }
-      return resp.status(200).json(order);
-    });
+      return resp.status(200).json(doc);
+    } catch (e) {
+      return next(404);
+    }
   },
   addOrder: async (req, resp, next) => {
     const {
@@ -53,15 +53,12 @@ module.exports = {
     }));
     const order = new Order(req.body);
     order.validateSync();
-    return order.save((err, newOrder) => {
-      if (err && err._message === 'Orders validation failed') {
-        return next(400);
-      }
-      if (err) {
-        return next(500);
-      }
-      return resp.status(200).json(newOrder);
-    });
+    try {
+      const doc = await order.save();
+      return resp.status(200).json(doc);
+    } catch (e) {
+      return next(400);
+    }
   },
   updateOrder: async (req, resp, next) => {
     if (Object.keys(req.body).length === 0) {
@@ -72,35 +69,32 @@ module.exports = {
       req.body.dateProcessed = Date.now();
     }
     try {
-      await Order.updateOne({ _id: req.params.orderId }, req.body, { runValidators: true });
-      const doc = await Order.findOne({ _id: req.params.orderId });
+      const doc = await Order.findOneAndUpdate({ _id: req.params.orderId }, req.body, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+        context: 'query',
+      });
       if (!doc) {
-        return next(404);
+        throw new Error('Not Found');
       }
       return resp.status(200).json(doc);
     } catch (e) {
-      if (e._message === 'Validation failed' || e.kind === 'date') {
-        return next(400);
-      }
-      if (e.kind === 'ObjectId') {
+      if (e.message === 'Not Found' || e.kind === 'ObjectId') {
         return next(404);
       }
-      return next(500);
+      return next(400);
     }
   },
   deleteOrder: async (req, resp, next) => {
     try {
-      const doc = await Order.findOne({ _id: req.params.orderId });
+      const doc = await Order.findOneAndDelete({ _id: req.params.orderId });
       if (!doc) {
-        return next(404);
+        throw new Error('Not Found');
       }
-      await Order.deleteOne({ _id: req.params.orderId });
       return resp.status(200).json(doc);
     } catch (e) {
-      if (e.kind === 'ObjectId') {
-        return next(404);
-      }
-      return next(500);
+      return next(404);
     }
   },
 };

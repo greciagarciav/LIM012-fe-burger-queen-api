@@ -16,16 +16,19 @@ module.exports = {
       return resp.status(200).json(products.docs);
     });
   },
-  getOneProduct: (req, resp, next) => {
+  getOneProduct: async (req, resp, next) => {
     const { productId } = req.params;
-    return Product.findOne({ _id: productId }, (err, product) => {
-      if (err || !product) {
-        return next(404);
+    try {
+      const doc = await Product.findOne({ _id: productId });
+      if (!doc) {
+        throw new Error('Not Found');
       }
-      return resp.status(200).json(product);
-    });
+      return resp.status(200).json(doc);
+    } catch (e) {
+      return next(404);
+    }
   },
-  addProduct: (req, resp, next) => {
+  addProduct: async (req, resp, next) => {
     const {
       name, price,
     } = req.body;
@@ -33,12 +36,12 @@ module.exports = {
       return next(400);
     }
     const product = new Product(req.body);
-    return product.save((err, newProduct) => {
-      if (err) {
-        return next(400);
-      }
-      return resp.status(200).json(newProduct);
-    });
+    try {
+      const doc = await product.save();
+      return resp.status(200).json(doc);
+    } catch (e) {
+      return next(400);
+    }
   },
   updateProduct: async (req, resp, next) => {
     if (Object.keys(req.body).length === 0) {
@@ -64,11 +67,10 @@ module.exports = {
   },
   deleteProduct: async (req, resp, next) => {
     try {
-      const doc = await Product.findOne({ _id: req.params.productId });
+      const doc = await Product.findOneAndDelete({ _id: req.params.productId });
       if (!doc) {
         throw new Error('Not Found');
       }
-      await Product.deleteOne({ _id: req.params.productId });
       return resp.status(200).json(doc);
     } catch (e) {
       return next(404);
