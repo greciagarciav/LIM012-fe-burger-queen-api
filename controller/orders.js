@@ -6,7 +6,7 @@ module.exports = {
   getOrders: (req, resp, next) => {
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
-    Order.paginate({}, { sort: 'dateEntry', page, limit }, (err, orders) => {
+    return Order.paginate({}, { sort: 'dateEntry', page, limit }, (err, orders) => {
       if (err) {
         return next(500);
       }
@@ -19,7 +19,7 @@ module.exports = {
   },
   getOneOrder: (req, resp, next) => {
     const { orderId } = req.params;
-    Order.findOne({ _id: orderId }, (err, order) => {
+    return Order.findOne({ _id: orderId }, (err, order) => {
       if ((err && err.kind === 'ObjectId') || !order) {
         return next(404);
       }

@@ -19,11 +19,8 @@ module.exports = {
   getOneProduct: (req, resp, next) => {
     const { productId } = req.params;
     return Product.findOne({ _id: productId }, (err, product) => {
-      if ((err && err.kind === 'ObjectId') || !product) {
+      if (err || !product) {
         return next(404);
-      }
-      if (err) {
-        return next(500);
       }
       return resp.status(200).json(product);
     });
@@ -37,11 +34,8 @@ module.exports = {
     }
     const product = new Product(req.body);
     return product.save((err, newProduct) => {
-      if (err && err._message === 'Products validation failed') {
-        return next(400);
-      }
       if (err) {
-        return next(500);
+        return next(400);
       }
       return resp.status(200).json(newProduct);
     });
@@ -51,18 +45,19 @@ module.exports = {
       return next(400);
     }
     try {
-      await Product.updateOne({ _id: req.params.productId }, req.body);
-      const doc = await Product.findOne({ _id: req.params.productId });
+      const doc = await Product.findOneAndUpdate({ _id: req.params.productId }, req.body, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+        context: 'query',
+      });
       if (!doc) {
-        return next(404);
+        throw new Error('Not Found');
       }
       return resp.status(200).json(doc);
     } catch (e) {
-      if (e.kind === 'ObjectId') {
+      if (e.message === 'Not Found' || e.kind === 'ObjectId') {
         return next(404);
-      }
-      if (e._message === 'Validation failed' || e.kind === 'date') {
-        return next(400);
       }
       return next(400);
     }
@@ -71,15 +66,12 @@ module.exports = {
     try {
       const doc = await Product.findOne({ _id: req.params.productId });
       if (!doc) {
-        return next(404);
+        throw new Error('Not Found');
       }
       await Product.deleteOne({ _id: req.params.productId });
       return resp.status(200).json(doc);
     } catch (e) {
-      if (e.kind === 'ObjectId') {
-        return next(404);
-      }
-      return next(500);
+      return next(404);
     }
   },
 };

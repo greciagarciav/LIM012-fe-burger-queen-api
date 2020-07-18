@@ -22,7 +22,6 @@ module.exports = {
     const field = uid.match(/@/g) ? 'email' : '_id';
     return User.findOne({ [field]: uid }, { password: 0 }, (err, dbUser) => {
       if (err || !dbUser) {
-        console.log('entre');
         return next(404);
       }
       return resp.status(200).json(dbUser);
@@ -50,39 +49,33 @@ module.exports = {
         roles: savedUser.roles,
       });
     } catch (e) {
-      if (e._message === 'Users validation failed') {
-        return next(400);
-      }
-      return next(500);
+      return next(400);
     }
   },
   updateUser: async (req, resp, next) => {
     const { uid } = req.params;
     const { email, password, roles } = req.body;
     const field = uid.match(/@/g) ? 'email' : '_id';
-    const userExists = await User.findOne({ [field]: uid });
-    if (!userExists) {
-      return next(404);
-    }
-    const userData = req.headers.user;
-    if (roles) {
-      if (!userData.roles.admin && roles.admin !== userData.roles.admin) {
-        return next(403);
-      }
-    }
-    if (!email && !password) {
-      return next(400);
-    }
-    if (password && password.length < 5) {
-      return next(400);
-    }
-    if (email && email === userData.email) {
-      delete req.body.email;
-    }
-    if (password) {
-      req.body.password = bcrypt.hashSync(password, 10);
-    }
     try {
+      const userExists = await User.findOne({ [field]: uid });
+      if (!userExists) {
+        throw new Error('Not Found');
+      }
+      const userData = req.headers.user;
+      if (roles) {
+        if (!userData.roles.admin && roles.admin !== userData.roles.admin) {
+          return next(403);
+        }
+      }
+      if ((!email && !password) || (password && password.length < 5)) {
+        return next(400);
+      }
+      if (email && email === userData.email) {
+        delete req.body.email;
+      }
+      if (password) {
+        req.body.password = bcrypt.hashSync(password, 10);
+      }
       const doc = await User.findOneAndUpdate({ [field]: uid }, req.body, {
         new: true,
         runValidators: true,
@@ -92,10 +85,10 @@ module.exports = {
       });
       return resp.status(200).json(doc);
     } catch (e) {
-      if (e._message === 'Validation failed') {
-        return next(400);
+      if (e.message === 'Not Found' || e.kind === 'ObjectId') {
+        return next(404);
       }
-      return next(500);
+      return next(400);
     }
   },
   deleteUser: async (req, resp, next) => {
@@ -104,15 +97,12 @@ module.exports = {
     try {
       const doc = await User.findOne({ [field]: uid }, { password: 0 });
       if (!doc) {
-        return next(404);
+        throw new Error('Not Found');
       }
       await User.deleteOne({ [field]: uid });
       return resp.status(200).json(doc);
     } catch (e) {
-      if (e.kind === 'ObjectId') {
-        return next(400);
-      }
-      return next(500);
+      return next(404);
     }
   },
 };
