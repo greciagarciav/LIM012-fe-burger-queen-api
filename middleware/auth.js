@@ -16,7 +16,7 @@ module.exports = (secret) => (req, resp, next) => {
     if (err) {
       return next(403);
     }
-
+    // TODO: Verificar identidad del usuario usando `decodeToken.uid`
     const userId = decodedToken.uid;
     User.findOne({ _id: userId }).then((user) => {
       req.headers.user = user;
@@ -24,11 +24,8 @@ module.exports = (secret) => (req, resp, next) => {
     }).catch(() => {
       next(403);
     });
-
-    // TODO: Verificar identidad del usuario usando `decodeToken.uid`
   });
 };
-
 
 // TODO: decidir por la informacion del request si la usuaria esta autenticada
 module.exports.isAuthenticated = (req) => (req.headers.user);
@@ -52,7 +49,6 @@ module.exports.requireAuth = (req, resp, next) => (
     ? next(401)
     : next()
 );
-
 
 module.exports.requireAdmin = (req, resp, next) => (
   // eslint-disable-next-line no-nested-ternary

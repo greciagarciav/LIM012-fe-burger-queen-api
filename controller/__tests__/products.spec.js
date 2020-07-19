@@ -11,20 +11,10 @@ const {
   addProduct,
   deleteProduct,
   updateProduct,
-} = require('../../controller/products');
+} = require('../products');
 const { connectToDB } = require('../../database/db-connect');
+const { resp, next } = require('./mock-express');
 
-const resp = {
-  json: (obj) => obj,
-  status(responseStatus) {
-    this.statusCode = responseStatus;
-    return this;
-  },
-  setHeader: (name, value) => {
-    this[name] = value;
-  },
-};
-const next = (number) => number;
 const standardReq = {
   query: {
     page: 1,

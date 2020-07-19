@@ -13,21 +13,9 @@ const {
   addUser,
   deleteUser,
   updateUser,
-} = require('../../controller/users');
+} = require('../users');
 const { connectToDB } = require('../../database/db-connect');
-
-// Mock Express Arguments
-const resp = {
-  json: (obj) => obj,
-  status(responseStatus) {
-    this.statusCode = responseStatus;
-    return this;
-  },
-  setHeader: (name, value) => {
-    this[name] = value;
-  },
-};
-const next = (number) => number;
+const { resp, next } = require('./mock-express');
 
 // DATA
 const userAddedReq = {

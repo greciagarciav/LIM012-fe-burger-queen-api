@@ -4,27 +4,18 @@ const { MockMongoose } = require('mock-mongoose');
 jest.setTimeout(50000);
 
 const mockMongoose = new MockMongoose(mongoose);
+const Product = require('../../database/product-schema');
+
 const {
   getOrders,
   getOneOrder,
   addOrder,
   deleteOrder,
   updateOrder,
-} = require('../../controller/orders');
+} = require('../orders');
 const { connectToDB } = require('../../database/db-connect');
-const Product = require('../../database/product-schema');
+const { resp, next } = require('./mock-express');
 
-const resp = {
-  json: (obj) => obj,
-  status(responseStatus) {
-    this.statusCode = responseStatus;
-    return this;
-  },
-  setHeader: (name, value) => {
-    this[name] = value;
-  },
-};
-const next = (number) => number;
 const wrongIdReq = {
   params: {
     orderId: '676bfr754v4767ggv',
