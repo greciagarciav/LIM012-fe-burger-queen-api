@@ -67,6 +67,10 @@
 * [ ] Modularización
 * [ ] Nomenclatura / Semántica
 * [ ] Linting
+### API
+> Las APIs permiten que las aplicaciones se comuniquen y puedan aprovechar desarrollos ya construidos en lugar de tener que crearlos desde cero. Son interfaces que permiten la comunicación entre dos aplicaciones de software siguiendo cierto conjunto de reglas. REST (Representational State Transfer) es una Arquitectura de Software.
+### SERVIDOR WEB
+> Un servidor web o servidor HTTP es un programa informático que procesa una aplicación del lado del servidor, realizando conexiones con el cliente y generando o cediendo una respuesta en cualquier lenguaje o aplicación del lado del cliente. El código recibido por el cliente es renderizado por un navegador web.. Generalmente se usa el protocolo HTTP para estas comunicaciones.
 ### EXPRESS
 #### ROUTES
 > Son caminos que el usuario toma, que vienen adjuntos con un codigo que será ejecutado cuando el usuario llegue a una ruta en específico. Hace referencia a la determinación de cómo responde una aplicación a una solicitud de cliente en un determinado punto final, que es un URI (o una vía de acceso) y un método de solicitud HTTP específico.
@@ -90,13 +94,13 @@ Pueden realizar lo siguiente:
 #### BODY
 > Datos transmitidos en un mensaje de transacción HTTP.
 #### VERBOS
-##### GET
+##### <span style="color: green">GET<span/>
 > solicita una representación de un recurso específico. Estas peticiones sólo deben recuperar datos.
-##### POST
+##### <span style="color: orange">POST<span/>
 > se utiliza para enviar una entidad a un recurso en específico.
-##### PUT
+##### <span style="color: blue">PUT<span/>
 > Reemplaza todas las representaciones actuales del recurso de destino con la carga útil de la petición.
-##### DELETE
+##### <span style="color: red">DELETE<span/>
 > Borra un recurso en específico.
 #### CÓDIGOS DE STATUS
 > [Status Code](https://httpstatuses.com)
@@ -110,3 +114,26 @@ Es un mecanismo que utiliza cabeceras HTTP adicionales para permitir que un user
 #### PAGINACIÓN
 > Cuando el numero de resultados de una consulta es grande, es necesario dividirlo,
 para que la eficiencia (tiempo de carga) y la experiencia de usuario no se negativa.
+### AUTENTICACIÓN
+#### JWT
+> JSON Web Token es un estándar abierto basado en JSON para la creación de tokens de acceso que permiten la propagación de identidad y privilegios o claims. Por ejemplo, un servidor podría generar un token indicando que el usuario tiene privilegios de administrador y proporcionarlo a un cliente, entonces podría utilizar el token para probar que está actuando como un administrador en el cliente o en otro sistema.  El token está firmado por la clave del servidor, así que el cliente y el servidor son ambos capaz de verificar que el token es - legítimo. Consiste en 3 partes: Header, Payload y Signature.
+### FRONTEND DEVELOPMET
+#### VARIABLES DE ENTORNO
+> Variables que pueden afectar al comportamiento de los procesos en ejecución en un ordenador.
+Son parte del entorno en el que se ejecuta un proceso. Independientemente del sistema operativo que estemos usando, son la forma simple de pasar información de una aplicación a otra. El valor que contienen puede variar, por lo tanto puede ser alterado por el usuario, por aplicaciones, o scripts. Esta claro que si se permite modificar su contenido, también se puede crear y eliminar dependiendo de las necesidades.
+> La propiedad process.env devuelve un objeto que contiene el entorno del usuario.
+#### SSH
+> Secure Shell, es un protocolo de red que permite el acceso a un servidor por acceso remoto a través de una conexión segura, permitiendo a un usuario realizar toda clase de tareas sobre el mismo. <br> Una conexión SSH requiere de 3 apartados: <br>
+Usuario <br>
+Puerto <br>
+Servidor <br>
+Esta conexión va cifrada de manera bidireccional, así que para se logre esta conexión SSH, el servidor SSH y el cliente se deben autenticar mutuamente. <br> El cliente debe introducir el usuario, puerto y servidor al que desea acceder. Una vez hecho, el servidor emite una autenticación solicitando al cliente una contraseña que le permita el acceso al servidor. <br> Una vez que el cliente introduce la contraseña, este ya se puede acceder de forma totalmente segura. La comunicación que haya a partir de ese momento esta completamente encriptada.
+#### SSH Keys
+> Una clave SSH es uno de los dos archivos utilizados en un método de autenticación conocido como autenticación de clave pública SSH. En este método de autenticación, un archivo (conocido como la clave privada) generalmente se mantiene en el lado del cliente y el otro archivo (conocido como la clave pública) se almacena en el lado del servidor.
+#### VPS
+> Un servidor virtual privado (virtual private server) es un método de particionar un servidor físico en varios servidores virtuales (máquinas virtuales con tareas de servidor) de tal forma que todo funcione como si se estuviese ejecutando en una única máquina. Cada servidor virtual es capaz de funcionar bajo su propio sistema operativo y además cada servidor puede ser reiniciado de forma independiente.
+### DEPLOYMENT
+#### CONTENEDORES
+> Los contenedores de software son un paquete de elementos que permiten ejecutar una aplicación determinada en cualquier sistema operativo. Se utilizan para garantizar que una determinada aplicación se ejecute correctamente cuando cambie su entorno.
+#### DOCKER
+> Docker es un proyecto de código abierto que automatiza el despliegue de aplicaciones dentro de contenedores de software, proporcionando una capa adicional de abstracción y automatización de virtualización de aplicaciones en múltiples sistemas operativo

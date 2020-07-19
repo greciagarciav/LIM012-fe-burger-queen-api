@@ -227,7 +227,7 @@ describe('Users', () => {
     expect(result._doc).toEqual(userData);
     expect(userExists).toBeNull();
   });
-  it('should not update or delete the user when not found', async () => {
+  it('should not update or delete the user when is not found', async () => {
     const result1 = await deleteUser(failedReq, resp, next);
     const result2 = await updateUser(failedReq, resp, next);
     expect(result1).toBe(404);

@@ -147,7 +147,7 @@ describe('Products', () => {
     const result = await updateProduct(req, resp, next);
     expect(result).toBe(400);
   });
-  it('should not update or delete a product when ObjectId is wrong', async () => {
+  it('should not update or delete a product when the ObjectId is wrong', async () => {
     const req = {
       params: {
         productId: '5f0f8080ab0857cd368ab972',

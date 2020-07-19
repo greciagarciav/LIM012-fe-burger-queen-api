@@ -30,7 +30,7 @@ describe('Orders', () => {
       });
     });
   });
-  it('should add an order and be able to updated when the values given are ok and rejected when not', async () => {
+  it('should add an order and be able to update it when the values given are ok and reject it when not', async () => {
     const product = new Product({
       name: 'fakeBurguer',
       price: 7,
