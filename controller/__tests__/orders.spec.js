@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { MockMongoose } = require('mock-mongoose');
 
+jest.setTimeout(50000);
+
 const mockMongoose = new MockMongoose(mongoose);
 const {
   getOrders,
@@ -47,6 +49,7 @@ describe('Orders', () => {
         body: {
           userId: '65vgr76v5e4swvky7u',
           products: [{ productId: actualProduct._id, qty: 3 }],
+          client: 'usuarix',
         },
       };
       const result = await addOrder(req, resp, next);
@@ -74,6 +77,7 @@ describe('Orders', () => {
       expect(order.products[0].product.name).toBe('fakeBurguer');
       expect(order.products[0].product.price).toBe(7);
       expect(order.status).toBe('pending');
+      expect(order.client).toBe('usuarix');
       expect(orderUpdated.status).toBe('delivered');
       expect(orderUpdated.dateProcessed).toBeDefined();
       expect(failedOrderUpdated).toBe(400);
@@ -226,10 +230,19 @@ describe('Orders', () => {
         limit: 1,
       },
     };
+    const req2 = {
+      query: {
+        page: 3,
+        limit: 1,
+      },
+    };
     const result = await getOrders(req, resp, next);
+    const result2 = await getOrders(req2, resp, next);
     expect(result.length).toBe(1);
     expect(result[0].products[0].product.name).toBe('fakeHotDog');
     expect(result[0].products[0].product.price).toBe(7);
+    expect(result2[0].products[0].product.name).toBe('fakeChicken');
+    expect(result2[0].products[0].product.price).toBe(7);
   });
   afterAll(async () => {
     await mockMongoose.helper.reset();
