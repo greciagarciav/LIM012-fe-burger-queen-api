@@ -60,6 +60,7 @@ module.exports = {
       return next(400);
     }
   },
+  // update products
   updateOrder: async (req, resp, next) => {
     if (Object.keys(req.body).length === 0) {
       return next(400);

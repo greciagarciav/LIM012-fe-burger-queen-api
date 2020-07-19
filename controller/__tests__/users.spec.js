@@ -51,7 +51,7 @@ const userData = {
   email: 'test2@localhost',
   password: '123455',
   roles: {
-    admin: false,
+    admin: true,
   },
 };
 describe('Users', () => {
@@ -109,7 +109,6 @@ describe('Users', () => {
       },
     };
     delete userData.password;
-    delete userAddedReq.body.password;
     const result = await getUsers(req, resp, next);
     delete result[0]._doc._id;
     delete result[0]._doc.__v;
@@ -126,18 +125,17 @@ describe('Users', () => {
     delete result._doc.__v;
     expect(result._doc).toEqual(userData);
   });
-  it('should not get user requested with email: unknown@localhost and return 404', (done) => {
+  it('should not get user requested with email: unknown@localhost and return 404', async () => {
     const req = {
       params: {
         uid: 'unknown@localhost',
       },
     };
-    getOneUser(req, resp, (num) => {
-      expect(num).toBe(404);
-      done();
-    });
+    const result = await getOneUser(req, resp, next);
+    expect(result).toBe(404);
   });
   it('should not edit the user password when the new value is weak', async () => {
+    delete userAddedReq.body.password;
     const req = {
       body: {
         email: 'test@localhost',
@@ -164,7 +162,7 @@ describe('Users', () => {
     const result = await updateUser(req, resp, next);
     expect(result).toBe(400);
   });
-  it('should not be available to edit roles field when the user is not an admin', async () => {
+  it('should not be able to edit roles field when the user is not an admin', async () => {
     const req = {
       body: {
         password: 'changeme',
@@ -184,7 +182,7 @@ describe('Users', () => {
     const result = await updateUser(req, resp, next);
     expect(result).toBe(403);
   });
-  it('should not be available to edit when there is not email and password present in the body', async () => {
+  it('should not be able to edit when there is not email and password present in the body', async () => {
     const req = {
       body: {},
       params: { uid: 'test@localhost' },
@@ -199,7 +197,6 @@ describe('Users', () => {
     const req = {
       body: {
         email: 'newtest@localhost',
-        password: 'changeme',
       },
       params: { uid: 'test@localhost' },
       headers: {
@@ -209,9 +206,27 @@ describe('Users', () => {
     const result = await updateUser(req, resp, next);
     expect(result.email).toBe('newtest@localhost');
   });
-  it('should not edit the user when not found', async () => {
-    const result = await updateUser(failedReq, resp, next);
-    expect(result).toBe(404);
+  it('should edit the user roles', async () => {
+    const req = {
+      body: {
+        email: 'newtest@localhost',
+        password: 'newPassword',
+        roles: {
+          admin: false,
+        },
+      },
+      params: { uid: 'newtest@localhost' },
+      headers: {
+        user: {
+          email: 'newtest@localhost',
+          roles: {
+            admin: true,
+          },
+        },
+      },
+    };
+    const result = await updateUser(req, resp, next);
+    expect(result.roles.admin).toBeFalsy();
   });
   it('should delete user requested with email: test2@localhost', async () => {
     const req = {
@@ -224,9 +239,11 @@ describe('Users', () => {
     expect(result._doc).toEqual(userData);
     expect(userExists).toBeNull();
   });
-  it('should not delete the user when not found', async () => {
-    const result = await deleteUser(failedReq, resp, next);
-    expect(result).toBe(404);
+  it('should not update or delete the user when not found', async () => {
+    const result1 = await deleteUser(failedReq, resp, next);
+    const result2 = await updateUser(failedReq, resp, next);
+    expect(result1).toBe(404);
+    expect(result2).toBe(404);
   });
   afterAll(async () => {
     await mockMongoose.helper.reset();

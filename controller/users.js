@@ -17,15 +17,18 @@ module.exports = {
       return resp.status(200).json(users.docs);
     });
   },
-  getOneUser: (req, resp, next) => {
+  getOneUser: async (req, resp, next) => {
     const { uid } = req.params;
     const field = uid.match(/@/g) ? 'email' : '_id';
-    return User.findOne({ [field]: uid }, { password: 0 }, (err, dbUser) => {
-      if (err || !dbUser) {
-        return next(404);
+    try {
+      const doc = await User.findOne({ [field]: uid }, { password: 0 });
+      if (!doc) {
+        throw new Error('Not Found');
       }
-      return resp.status(200).json(dbUser);
-    });
+      return resp.status(200).json(doc);
+    } catch (e) {
+      return next(404);
+    }
   },
   addUser: async (req, resp, next) => {
     const { email, password } = req.body;
@@ -95,11 +98,10 @@ module.exports = {
     const { uid } = req.params;
     const field = uid.match(/@/g) ? 'email' : '_id';
     try {
-      const doc = await User.findOne({ [field]: uid }, { password: 0 });
+      const doc = await User.findOneAndDelete({ [field]: uid }, { select: '-password' });
       if (!doc) {
         throw new Error('Not Found');
       }
-      await User.deleteOne({ [field]: uid });
       return resp.status(200).json(doc);
     } catch (e) {
       return next(404);

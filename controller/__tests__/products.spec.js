@@ -143,21 +143,11 @@ describe('Products', () => {
         dateEntry: 'today',
       },
     };
-    const wrongIdReq = {
-      params: {
-        productId: 'wrong-id',
-      },
-      body: {
-        price: 20,
-      },
-    };
     const result = await updateProduct(req, resp, next);
     const result2 = await updateProduct(wrongPriceReq, resp, next);
-    const result3 = await updateProduct(wrongIdReq, resp, next);
     const result4 = await updateProduct(wrongDateReq, resp, next);
     expect(result.name).toBe('bacon');
     expect(result2).toBe(400);
-    expect(result3).toBe(404);
     expect(result4).toBe(400);
   });
   it('should not update a product when the body is empty', async () => {
