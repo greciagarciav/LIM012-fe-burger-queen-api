@@ -9,7 +9,7 @@ const usersSchema = new Schema({
     unique: true,
     required: [true, 'Email is necessary'],
     validate: {
-      validator: (v) => /@/g.test(v),
+      validator: (v) => /^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$/.test(v),
       message: (props) => `${props.value} is not a valid Email!`,
     },
   },
@@ -29,7 +29,7 @@ const usersSchema = new Schema({
     },
   },
 });
-// se agrera el plugin de validacion unica y exportamos el schema
+// se agrera el plugin de validacion unica
 usersSchema.plugin(uniqueValidator, {
   message: '{PATH} debe de ser único',
 });
