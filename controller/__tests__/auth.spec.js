@@ -1,12 +1,7 @@
-const mongoose = require('mongoose');
-const { MockMongoose } = require('mock-mongoose');
-
-const mockMongoose = new MockMongoose(mongoose);
 const bcrypt = require('bcrypt');
 const User = require('../../database/user-schema');
 
 const getAuth = require('../auth');
-const { connectToDB } = require('../../database/db-connect');
 const { resp, next } = require('./mock-express');
 
 const req = {
@@ -21,14 +16,8 @@ const userTest = {
 };
 
 describe('Auth', () => {
-  beforeAll((done) => {
-    mockMongoose.prepareStorage().then(() => {
-      connectToDB('mongodb://127.0.0.1/BurguerQueen');
-      mongoose.connection.on('connected', async () => {
-        await new User(userTest).save();
-        done();
-      });
-    });
+  beforeAll(async () => {
+    await new User(userTest).save();
   });
   it('should get a token', async () => {
     const result = await getAuth(req, resp, next);
@@ -69,9 +58,5 @@ describe('Auth', () => {
     };
     const result = await getAuth(req, resp, next);
     expect(result).toBe(403);
-  });
-  afterAll(async () => {
-    await mockMongoose.helper.reset();
-    await mockMongoose.killMongo();
   });
 });

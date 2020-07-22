@@ -1,10 +1,6 @@
 // npx jest -t getUsers
-const mongoose = require('mongoose');
-const { MockMongoose } = require('mock-mongoose');
-
 jest.setTimeout(50000);
 
-const mockMongoose = new MockMongoose(mongoose);
 const User = require('../../database/user-schema');
 
 const {
@@ -14,7 +10,6 @@ const {
   deleteUser,
   updateUser,
 } = require('../users');
-const { connectToDB } = require('../../database/db-connect');
 const { resp, next } = require('./mock-express');
 
 // DATA
@@ -43,17 +38,11 @@ const userData = {
   },
 };
 describe('Users', () => {
-  beforeAll((done) => {
-    mockMongoose.prepareStorage().then(() => {
-      connectToDB('mongodb://127.0.0.1/BurguerQueen');
-      mongoose.connection.on('connected', async () => {
-        const req = {
-          body: userData,
-        };
-        await addUser(req, resp, next);
-        done();
-      });
-    });
+  beforeAll(async () => {
+    const req = {
+      body: userData,
+    };
+    await addUser(req, resp, next);
   });
   it('should add a user to the colection', async () => {
     const result = await addUser(userAddedReq, resp, next);
@@ -232,9 +221,5 @@ describe('Users', () => {
     const result2 = await updateUser(failedReq, resp, next);
     expect(result1).toBe(404);
     expect(result2).toBe(404);
-  });
-  afterAll(async () => {
-    await mockMongoose.helper.reset();
-    await mockMongoose.killMongo();
   });
 });

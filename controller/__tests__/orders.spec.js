@@ -1,9 +1,5 @@
-const mongoose = require('mongoose');
-const { MockMongoose } = require('mock-mongoose');
-
 jest.setTimeout(50000);
 
-const mockMongoose = new MockMongoose(mongoose);
 const Product = require('../../database/product-schema');
 
 const {
@@ -13,7 +9,6 @@ const {
   deleteOrder,
   updateOrder,
 } = require('../orders');
-const { connectToDB } = require('../../database/db-connect');
 const { resp, next } = require('./mock-express');
 
 const wrongIdReq = {
@@ -22,14 +17,6 @@ const wrongIdReq = {
   },
 };
 describe('Orders', () => {
-  beforeAll((done) => {
-    mockMongoose.prepareStorage().then(() => {
-      connectToDB('mongodb://127.0.0.1/BurguerQueen');
-      mongoose.connection.on('connected', () => {
-        done();
-      });
-    });
-  });
   it('should add an order and be able to update it when the values given are ok and reject it when not', async () => {
     const product = new Product({
       name: 'fakeBurguer',
@@ -234,9 +221,5 @@ describe('Orders', () => {
     expect(result[0].products[0].product.price).toBe(7);
     expect(result2[0].products[0].product.name).toBe('fakeChicken');
     expect(result2[0].products[0].product.price).toBe(7);
-  });
-  afterAll(async () => {
-    await mockMongoose.helper.reset();
-    await mockMongoose.killMongo();
   });
 });
