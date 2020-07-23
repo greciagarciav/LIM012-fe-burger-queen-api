@@ -123,15 +123,19 @@ para que la eficiencia (tiempo de carga) y la experiencia de usuario no se negat
 Son parte del entorno en el que se ejecuta un proceso. Independientemente del sistema operativo que estemos usando, son la forma simple de pasar información de una aplicación a otra. El valor que contienen puede variar, por lo tanto puede ser alterado por el usuario, por aplicaciones, o scripts. Esta claro que si se permite modificar su contenido, también se puede crear y eliminar dependiendo de las necesidades.
 > La propiedad process.env devuelve un objeto que contiene el entorno del usuario.
 #### SSH
-> Secure Shell, es un protocolo de red que permite el acceso a un servidor por acceso remoto a través de una conexión segura, permitiendo a un usuario realizar toda clase de tareas sobre el mismo. <br> Una conexión SSH requiere de 3 apartados: <br>
+> Protocolo para una comunicacion segura. Secure Shell, es un protocolo de red que permite el acceso a un servidor por acceso remoto a través de una conexión segura, permitiendo a un usuario realizar toda clase de tareas sobre el mismo. <br> Una conexión SSH requiere de 3 apartados: <br>
 Usuario <br>
 Puerto <br>
 Servidor <br>
 Esta conexión va cifrada de manera bidireccional, así que para se logre esta conexión SSH, el servidor SSH y el cliente se deben autenticar mutuamente. <br> El cliente debe introducir el usuario, puerto y servidor al que desea acceder. Una vez hecho, el servidor emite una autenticación solicitando al cliente una contraseña que le permita el acceso al servidor. <br> Una vez que el cliente introduce la contraseña, este ya se puede acceder de forma totalmente segura. La comunicación que haya a partir de ese momento esta completamente encriptada.
 #### SSH Keys
 > Una clave SSH es uno de los dos archivos utilizados en un método de autenticación conocido como autenticación de clave pública SSH. En este método de autenticación, un archivo (conocido como la clave privada) generalmente se mantiene en el lado del cliente y el otro archivo (conocido como la clave pública) se almacena en el lado del servidor.
+#### DNS 
+> Domain Name System (DNS) es el libro de telefonos para el Internet. accedemos a informacion online a travez de los nombres de los dominios. Los navegadores webs interactuan a traves del protocolo de internet (IP) de direcciones. DNS traduce los nombres de los dominios a la direccion IP para que los navegadores puedan cargar los recursos del internet. Cada dispositivo conectado al internet tiene una direccion IP unica que otras maquinas usan para encontrarlo. Los servidores DNS eliminan la necesidad de memorizar esas direcciones IP como 192.168.1.1 (in IPv4), o otros mucho mas complejos como 2400:cb00:2048:1::c629:d7a2 (in IPv6).
 #### VPS
 > Un servidor virtual privado (virtual private server) es un método de particionar un servidor físico en varios servidores virtuales (máquinas virtuales con tareas de servidor) de tal forma que todo funcione como si se estuviese ejecutando en una única máquina. Cada servidor virtual es capaz de funcionar bajo su propio sistema operativo y además cada servidor puede ser reiniciado de forma independiente.
+##### EC2
+> Es un servidor virtual en la nube de AWS. Se, puede instalar y configurar el sistema operativo y las aplicaciones que se ejecutan en la instancia.
 ### DEPLOYMENT
 #### CONTENEDORES
 > Los contenedores de software son un paquete de elementos que permiten ejecutar una aplicación determinada en cualquier sistema operativo. Se utilizan para garantizar que una determinada aplicación se ejecute correctamente cuando cambie su entorno.

@@ -1,6 +1,5 @@
 // npx jest -t getUsers
-jest.setTimeout(50000);
-
+const mongoose = require('mongoose');
 const User = require('../../database/user-schema');
 
 const {
@@ -11,6 +10,7 @@ const {
   updateUser,
 } = require('../users');
 const { resp, next } = require('./mock-express');
+const { connectToDB } = require('../../database/db-connect');
 
 // DATA
 const userAddedReq = {
@@ -38,11 +38,15 @@ const userData = {
   },
 };
 describe('Users', () => {
-  beforeAll(async () => {
-    const req = {
-      body: userData,
-    };
-    await addUser(req, resp, next);
+  beforeAll((done) => {
+    connectToDB(process.env.MONGO_URL);
+    mongoose.connection.on('connected', async () => {
+      const req = {
+        body: userData,
+      };
+      await addUser(req, resp, next);
+      done();
+    });
   });
   it('should add a user to the colection', async () => {
     const result = await addUser(userAddedReq, resp, next);
@@ -221,5 +225,8 @@ describe('Users', () => {
     const result2 = await updateUser(failedReq, resp, next);
     expect(result1).toBe(404);
     expect(result2).toBe(404);
+  });
+  afterAll(async () => {
+    await mongoose.connection.close();
   });
 });

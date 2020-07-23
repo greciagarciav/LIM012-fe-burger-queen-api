@@ -1,5 +1,4 @@
-jest.setTimeout(50000);
-
+const mongoose = require('mongoose');
 const Product = require('../../database/product-schema');
 
 const {
@@ -10,6 +9,7 @@ const {
   updateOrder,
 } = require('../orders');
 const { resp, next } = require('./mock-express');
+const { connectToDB } = require('../../database/db-connect');
 
 const wrongIdReq = {
   params: {
@@ -17,6 +17,9 @@ const wrongIdReq = {
   },
 };
 describe('Orders', () => {
+  beforeAll(async () => {
+    await connectToDB(process.env.MONGO_URL);
+  });
   it('should add an order and be able to update it when the values given are ok and reject it when not', async () => {
     const product = new Product({
       name: 'fakeBurguer',
@@ -110,7 +113,7 @@ describe('Orders', () => {
     });
   });
   it('should add an order and be able to delete it', async () => {
-    const product = await new Product({
+    const product = new Product({
       name: 'fakeMeat',
       price: 8,
     }).save();
@@ -137,7 +140,7 @@ describe('Orders', () => {
     });
   });
   it('should not add an order when the status is not valid', async () => {
-    const product = await new Product({
+    const product = new Product({
       name: 'fakeEgg',
       price: 2,
     }).save();
@@ -221,5 +224,8 @@ describe('Orders', () => {
     expect(result[0].products[0].product.price).toBe(7);
     expect(result2[0].products[0].product.name).toBe('fakeChicken');
     expect(result2[0].products[0].product.price).toBe(7);
+  });
+  afterAll(async () => {
+    await mongoose.connection.close();
   });
 });

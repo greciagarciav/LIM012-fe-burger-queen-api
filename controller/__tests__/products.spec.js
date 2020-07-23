@@ -1,5 +1,4 @@
-jest.setTimeout(50000);
-
+const mongoose = require('mongoose');
 const {
   getProducts,
   getOneProduct,
@@ -8,6 +7,7 @@ const {
   updateProduct,
 } = require('../products');
 const { resp, next } = require('./mock-express');
+const { connectToDB } = require('../../database/db-connect');
 
 const standardReq = {
   query: {
@@ -23,8 +23,12 @@ const productReq = {
   },
 };
 describe('Products', () => {
-  beforeAll(async () => {
-    await addProduct(productReq, resp, next);
+  beforeAll((done) => {
+    connectToDB(process.env.MONGO_URL);
+    mongoose.connection.on('connected', async () => {
+      await addProduct(productReq, resp, next);
+      done();
+    });
   });
   it('should add a product', async () => {
     const req = {
@@ -161,5 +165,8 @@ describe('Products', () => {
     expect(result._doc).toEqual(products[0]._doc);
     const result2 = await getOneProduct(req2, resp, next);
     expect(result2).toBe(404);
+  });
+  afterAll(async () => {
+    await mongoose.connection.close();
   });
 });

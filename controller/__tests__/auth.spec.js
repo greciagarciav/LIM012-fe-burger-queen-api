@@ -1,8 +1,10 @@
+const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const User = require('../../database/user-schema');
 
 const getAuth = require('../auth');
 const { resp, next } = require('./mock-express');
+const { connectToDB } = require('../../database/db-connect');
 
 const req = {
   body: {
@@ -16,8 +18,12 @@ const userTest = {
 };
 
 describe('Auth', () => {
-  beforeAll(async () => {
-    await new User(userTest).save();
+  beforeAll((done) => {
+    connectToDB(process.env.MONGO_URL);
+    mongoose.connection.on('connected', async () => {
+      await new User(userTest).save();
+      done();
+    });
   });
   it('should get a token', async () => {
     const result = await getAuth(req, resp, next);
@@ -58,5 +64,8 @@ describe('Auth', () => {
     };
     const result = await getAuth(req, resp, next);
     expect(result).toBe(403);
+  });
+  afterAll(async () => {
+    await mongoose.connection.close();
   });
 });
