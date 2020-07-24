@@ -77,13 +77,11 @@
 #### MIDDLEWARES
 > funciones que tienen acceso al objeto de solicitud (req) y de respuesta (res) y a la siguiente función de middleware en el ciclo de solicitud/respuestas de la aplicación. La siguiente función de middleware se denota normalmente con una variable denominada next. <br>
 Pueden realizar lo siguiente:
->> * Ejecutar cualquier código.
->> * Realizar cambios en la solicitud y los objetos de respuesta.
->> * Finalizar el ciclo de solicitud/respuestas.
->> * Invocar el siguiente middleware en la pila. <br>
->>
+ * Ejecutar cualquier código.
+ * Realizar cambios en la solicitud y los objetos de respuesta.
+ * Finalizar el ciclo de solicitud/respuestas.
+ * Invocar el siguiente middleware en la pila. <br>
 > Si la función de middleware actual no finaliza el ciclo de solicitud/respuestas, debe invocar next() para pasar el control a la siguiente función de middleware. De lo contrario, la solicitud quedará colgada.
->
 ### HTTP
 #### REQUEST
 > Objeto que contiene información sobre la solicitud HTTP
@@ -140,4 +138,14 @@ Esta conexión va cifrada de manera bidireccional, así que para se logre esta c
 #### CONTENEDORES
 > Los contenedores de software son un paquete de elementos que permiten ejecutar una aplicación determinada en cualquier sistema operativo. Se utilizan para garantizar que una determinada aplicación se ejecute correctamente cuando cambie su entorno.
 #### DOCKER
-> Docker es un proyecto de código abierto que automatiza el despliegue de aplicaciones dentro de contenedores de software, proporcionando una capa adicional de abstracción y automatización de virtualización de aplicaciones en múltiples sistemas operativo
+> Docker es un proyecto de código abierto que automatiza el despliegue de aplicaciones dentro de contenedores de software, proporcionando una capa adicional de abstracción y automatización de virtualización de aplicaciones en múltiples sistemas operativo.
+##### DOCKER-COMPOSE
+> herramineta para definir y correr aplicaciones docker multicontenedores, con el archivo yml se configura los servicios de la app. Con un simple comando se crea e inicia todos los servicios de la configuracion. 
+Para usarlo solo se necitan 3 pasos:
+1. Definir el entorno con un archico docker y asi poder ser usado o reproducido donde sea.
+2. Definir los servicios que conforman tu app en docker-compose.yml para que corran juntos en un entorno aislado.
+3. Correr docker-compose up y Compose inicia y corre toda la app.
+##### DOCKER IMAGE
+> Archivo usado para ejecutar codigo en un contenedor Docker.
+##### DOCKER RUN
+> Docker corre procesos en contenedores aislados con su propio sistema de archivos. Un contenedor es un proceso que corre en un hospedador (host), local o remoto, 
