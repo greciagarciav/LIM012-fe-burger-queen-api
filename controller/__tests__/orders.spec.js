@@ -64,6 +64,55 @@ describe('Orders', () => {
       expect(failedOrderUpdated).toBe(400);
     });
   });
+  it('should update the products', async () => {
+    const product = new Product({
+      name: 'fries',
+      price: 2,
+    }).save();
+    const product2 = new Product({
+      name: 'cheese',
+      price: 3,
+    }).save();
+    Promise.all([product, product2]).then(async (products) => {
+      const req = {
+        body: {
+          userId: '65vgr76v5e4swvky7u',
+          products: [{ productId: products[0]._id, qty: 3 }],
+          client: 'usuarix',
+        },
+      };
+      const order = await addOrder(req, resp, next);
+      return [order, products[1]];
+    }).then(async (result) => {
+      const req = {
+        params: {
+          orderId: result[0]._id,
+        },
+        body: {
+          products: [
+            { productId: result[0].products[0].product._id, qty: 1 },
+          ],
+        },
+      };
+      const req2 = {
+        params: {
+          orderId: result[0]._id,
+        },
+        body: {
+          products: [
+            { productId: result[1]._id, qty: 2 },
+            { productId: result[0].products[0].product._id, qty: 0 },
+          ],
+        },
+      };
+      const orderUpdated = await updateOrder(req, resp, next);
+      const orderUpdated2 = await updateOrder(req2, resp, next);
+      expect(orderUpdated.products[0].qty).toBe(1);
+      expect(orderUpdated2.products[0].qty).toBe(2);
+      expect(orderUpdated2.products[0].product.name).toBe('cheese');
+      expect(orderUpdated2.products[0].product.price).toBe(3);
+    });
+  });
   it('should get one order by id', () => {
     const product1 = new Product({
       name: 'fakeHotDog',
@@ -220,10 +269,8 @@ describe('Orders', () => {
     const result = await getOrders(req, resp, next);
     const result2 = await getOrders(req2, resp, next);
     expect(result.length).toBe(1);
-    expect(result[0].products[0].product.name).toBe('fakeHotDog');
-    expect(result[0].products[0].product.price).toBe(7);
-    expect(result2[0].products[0].product.name).toBe('fakeChicken');
-    expect(result2[0].products[0].product.price).toBe(7);
+    expect(result[0].products[0].product.name).toBe('fries');
+    expect(result2[0].products[0].product.name).toBe('fakeHotDog');
   });
   afterAll(async () => {
     await mongoose.connection.close();

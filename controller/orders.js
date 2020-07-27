@@ -1,6 +1,21 @@
+/* eslint-disable eqeqeq */
 const Order = require('../database/order-schema');
 const Product = require('../database/product-schema');
 const { paginate } = require('./pagination');
+
+const getActualProduct = async (products) => Promise.all(products.map(async (product) => {
+  const { productId, qty } = product;
+  const { name, price, _id } = await Product.findById(productId);
+  const result = {
+    product: {
+      _id,
+      name,
+      price,
+    },
+    qty,
+  };
+  return result;
+}));
 
 module.exports = {
   getOrders: (req, resp, next) => {
@@ -39,18 +54,7 @@ module.exports = {
     if (!Array.isArray(products)) {
       return next(400);
     }
-    req.body.products = await Promise.all(products.map(async (product) => {
-      const { productId, qty } = product;
-      const { name, price } = await Product.findById(productId);
-      const result = {
-        product: {
-          name,
-          price,
-        },
-        qty,
-      };
-      return result;
-    }));
+    req.body.products = await getActualProduct(products);
     const order = new Order(req.body);
     order.validateSync();
     try {
@@ -60,17 +64,37 @@ module.exports = {
       return next(400);
     }
   },
-  // update products
   updateOrder: async (req, resp, next) => {
     if (Object.keys(req.body).length === 0) {
       return next(400);
     }
-    const { status } = req.body;
+    const { orderId } = req.params;
+    const { status, products } = req.body;
     if (status && status === 'delivered') {
       req.body.dateProcessed = Date.now();
     }
     try {
-      const doc = await Order.findOneAndUpdate({ _id: req.params.orderId }, req.body, {
+      if (products) {
+        const actualOrder = await Order.findById({ _id: orderId });
+        if (!actualOrder) {
+          throw new Error('Not Found');
+        }
+        // eslint-disable-next-line array-callback-return
+        const actualProducts = actualOrder.products.filter((element) => {
+          if (products.some((e) => e.productId == element.product._id)) {
+            // eslint-disable-next-line no-param-reassign
+            element.qty = products.find((e) => e.productId == element.product._id).qty;
+            if (element.qty !== 0) {
+              return element;
+            }
+          }
+        });
+        const newProducts = products.filter((element) => (
+          !actualOrder.products.some((e) => e.product._id == (element.productId))
+        ));
+        req.body.products = actualProducts.concat(await getActualProduct(newProducts));
+      }
+      const doc = await Order.findOneAndUpdate({ _id: orderId }, req.body, {
         new: true,
         runValidators: true,
         useFindAndModify: false,
