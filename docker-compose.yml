@@ -4,7 +4,7 @@ services:
     image: "mongo"
     restart: "always"
     ports:
-      - 27017:27017
+      - "27017:27017"
     # TODO: configura tu imagen de base de datos, te recomendamos una de las sgtes:
     # https://hub.docker.com/_/mysql
     # https://hub.docker.com/_/mongo
