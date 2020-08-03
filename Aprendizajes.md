@@ -148,4 +148,6 @@ Para usarlo solo se necitan 3 pasos:
 ##### DOCKER IMAGE
 > Archivo usado para ejecutar codigo en un contenedor Docker.
 ##### DOCKER RUN
-> Docker corre procesos en contenedores aislados con su propio sistema de archivos. Un contenedor es un proceso que corre en un hospedador (host), local o remoto, 
+> Docker corre procesos en contenedores aislados con su propio sistema de archivos. Un contenedor es un proceso que corre en un hospedador (host), local o remoto.
+##### NANO <file-name>
+> Crear archivos en la terminal.

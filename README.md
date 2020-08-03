@@ -1,5 +1,5 @@
 # Burger Queen - API con Node.js
-
+![Frame 7](https://user-images.githubusercontent.com/58056552/89215869-00484f80-d58f-11ea-9759-33725e178dac.png)
 ## Índice
 
 * [1. Preámbulo](#1-pre%C3%A1mbulo)
