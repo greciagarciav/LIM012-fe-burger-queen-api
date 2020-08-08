@@ -2,8 +2,8 @@
 
 ### [Express](#express)
 
-* [ ] Rutas
-* [ ] `middlewares`
+* Rutas
+* `middlewares`
 
 ### [HTTP](#http)
 
@@ -38,7 +38,7 @@
 Permiten que las aplicaciones se comuniquen y puedan aprovechar desarrollos ya construidos en lugar de tener que crearlos desde cero. Son interfaces que permiten la comunicación entre dos aplicaciones de software siguiendo cierto conjunto de reglas. REST (Representational State Transfer) es una Arquitectura de Software.
 ### SERVIDOR WEB
 Un servidor web o servidor HTTP es un programa informático que procesa una aplicación del lado del servidor, realizando conexiones con el cliente y generando o cediendo una respuesta en cualquier lenguaje o aplicación del lado del cliente. El código recibido por el cliente es renderizado por un navegador web.. Generalmente se usa el protocolo HTTP para estas comunicaciones.
-### EXPRESS
+### **EXPRESS**
 #### ROUTES
 Caminos que el usuario toma, que vienen adjuntos con un codigo que será ejecutado cuando el usuario llegue a una ruta en específico. Hace referencia a la determinación de cómo responde una aplicación a una solicitud de cliente en un determinado punto final, que es un URI (o una vía de acceso) y un método de solicitud HTTP específico.
 #### MIDDLEWARES
@@ -49,7 +49,7 @@ Pueden realizar lo siguiente:
  * Finalizar el ciclo de solicitud/respuestas.
  * Invocar el siguiente middleware en la pila. <br>
 > Si la función de middleware actual no finaliza el ciclo de solicitud/respuestas, debe invocar next() para pasar el control a la siguiente función de middleware. De lo contrario, la solicitud quedará colgada.
-### HTTP
+### **HTTP**
 #### REQUEST
 Objeto que contiene información sobre la solicitud HTTP
 #### RESPONSE
@@ -59,13 +59,13 @@ Las cabeceras permiten al cliente y al servidor enviar información adicional ju
 #### BODY
 Datos transmitidos en un mensaje de transacción HTTP.
 #### VERBOS
-##### <span style="color: green">GET<span/>
+* GET
 Solicita una representación de un recurso específico. Estas peticiones sólo deben recuperar datos.
-##### <span style="color: orange">POST<span/>
+* POST
 Se utiliza para enviar una entidad a un recurso en específico.
-##### <span style="color: blue">PUT<span/>
+* PUT
 Reemplaza todas las representaciones actuales del recurso de destino con la carga útil de la petición.
-##### <span style="color: red">DELETE<span/>
+* DELETE
 Borra un recurso en específico.
 #### CÓDIGOS DE STATUS
 [Status Code](https://httpstatuses.com)
@@ -79,10 +79,10 @@ Es un mecanismo que utiliza cabeceras HTTP adicionales para permitir que un user
 #### PAGINACIÓN
 Cuando el numero de resultados de una consulta es grande, es necesario dividirlo,
 para que la eficiencia (tiempo de carga) y la experiencia de usuario no se negativa.
-### AUTENTICACIÓN
+### **AUTENTICACIÓN**
 #### JWT
 JSON Web Token es un estándar abierto basado en JSON para la creación de tokens de acceso que permiten la propagación de identidad y privilegios o claims. Por ejemplo, un servidor podría generar un token indicando que el usuario tiene privilegios de administrador y proporcionarlo a un cliente, entonces podría utilizar el token para probar que está actuando como un administrador en el cliente o en otro sistema.  El token está firmado por la clave del servidor, así que el cliente y el servidor son ambos capaz de verificar que el token es - legítimo. Consiste en 3 partes: Header, Payload y Signature.
-### FRONTEND DEVELOPMET
+### **FRONTEND DEVELOPMENT**
 #### VARIABLES DE ENTORNO
 Variables que pueden afectar al comportamiento de los procesos en ejecución en un ordenador.
 Son parte del entorno en el que se ejecuta un proceso. Independientemente del sistema operativo que estemos usando, son la forma simple de pasar información de una aplicación a otra. El valor que contienen puede variar, por lo tanto puede ser alterado por el usuario, por aplicaciones, o scripts. Esta claro que si se permite modificar su contenido, también se puede crear y eliminar dependiendo de las necesidades.
@@ -101,7 +101,7 @@ Domain Name System (DNS) es el libro de telefonos para el Internet. accedemos a 
 Un servidor virtual privado (virtual private server) es un método de particionar un servidor físico en varios servidores virtuales (máquinas virtuales con tareas de servidor) de tal forma que todo funcione como si se estuviese ejecutando en una única máquina. Cada servidor virtual es capaz de funcionar bajo su propio sistema operativo y además cada servidor puede ser reiniciado de forma independiente.
 ##### EC2
 Es un servidor virtual en la nube de AWS. Se, puede instalar y configurar el sistema operativo y las aplicaciones que se ejecutan en la instancia.
-### DEPLOYMENT
+### **DEPLOYMENT**
 #### CONTENEDORES
 Los contenedores de software son un paquete de elementos que permiten ejecutar una aplicación determinada en cualquier sistema operativo. Se utilizan para garantizar que una determinada aplicación se ejecute correctamente cuando cambie su entorno.
 #### DOCKER
