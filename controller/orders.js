@@ -1,21 +1,28 @@
-/* eslint-disable eqeqeq */
 const Order = require('../database/order-schema');
 const Product = require('../database/product-schema');
 const { paginate } = require('./pagination');
 
-const getActualProduct = async (products) => Promise.all(products.map(async (product) => {
-  const { productId, qty } = product;
-  const { name, price, _id } = await Product.findById(productId);
+const getActualProduct = (products) => Promise.all(products.map((product) => new Promise(
+  (resolve, reject) => {
+    const { productId } = product;
+    Product.findById(productId, (err, doc) => {
+      if (err) { reject(err.message); }
+      resolve(doc);
+    });
+    resolve(Product.findById(productId));
+  },
+).then((actualProduct) => {
+  const { name, price, _id } = actualProduct;
   const result = {
     product: {
       _id,
       name,
       price,
     },
-    qty,
+    qty: product.qty,
   };
   return result;
-}));
+}).catch((err) => err)));
 
 module.exports = {
   getOrders: (req, resp, next) => {
@@ -79,18 +86,17 @@ module.exports = {
         if (!actualOrder) {
           throw new Error('Not Found');
         }
-        // eslint-disable-next-line array-callback-return
         const actualProducts = actualOrder.products.filter((element) => {
-          if (products.some((e) => e.productId == element.product._id)) {
+          if (products.some((e) => String(e.productId) === String(element.product._id))) {
             // eslint-disable-next-line no-param-reassign
-            element.qty = products.find((e) => e.productId == element.product._id).qty;
-            if (element.qty !== 0) {
-              return element;
-            }
+            element.qty = products.find((e) => (
+              String(e.productId) === String(element.product._id))).qty;
           }
+          if (element.qty === 0) { return false; }
+          return true;
         });
         const newProducts = products.filter((element) => (
-          !actualOrder.products.some((e) => e.product._id == (element.productId))
+          !actualOrder.products.some((e) => String(e.product._id) === String(element.productId))
         ));
         req.body.products = actualProducts.concat(await getActualProduct(newProducts));
       }
