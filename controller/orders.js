@@ -2,27 +2,19 @@ const Order = require('../database/order-schema');
 const Product = require('../database/product-schema');
 const { paginate } = require('./pagination');
 
-const getActualProduct = (products) => Promise.all(products.map((product) => new Promise(
-  (resolve, reject) => {
-    const { productId } = product;
-    Product.findById(productId, (err, doc) => {
-      if (err) { reject(err.message); }
-      resolve(doc);
-    });
-    resolve(Product.findById(productId));
-  },
-).then((actualProduct) => {
-  const { name, price, _id } = actualProduct;
+const getActualProduct = (products) => Promise.all(products.map(async (product) => {
+  const { productId, qty } = product;
+  const { name, price, _id } = await Product.findById(productId);
   const result = {
     product: {
       _id,
       name,
       price,
     },
-    qty: product.qty,
+    qty,
   };
   return result;
-}).catch((err) => err)));
+}));
 
 module.exports = {
   getOrders: (req, resp, next) => {
