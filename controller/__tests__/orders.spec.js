@@ -108,6 +108,7 @@ describe('Orders', () => {
       const orderUpdated = await updateOrder(req, resp, next);
       const orderUpdated2 = await updateOrder(req2, resp, next);
       expect(orderUpdated.products[0].qty).toBe(1);
+      expect(orderUpdated2.total).toBe(6);
       expect(orderUpdated2.products[0].qty).toBe(2);
       expect(orderUpdated2.products[0].product.name).toBe('cheese');
       expect(orderUpdated2.products[0].product.price).toBe(3);

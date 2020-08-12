@@ -20,6 +20,10 @@ const ordersSchema = new Schema({
     enum: ['pending', 'canceled', 'preparing', 'delivering', 'delivered'],
     default: 'pending',
   },
+  total: {
+    type: Number,
+    required: true,
+  },
   dateEntry: {
     type: Date,
     default: Date.now,

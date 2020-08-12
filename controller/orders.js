@@ -16,6 +16,11 @@ const getActualProduct = (products) => Promise.all(products.map(async (product) 
   return result;
 }));
 
+const getTotal = (arr) => {
+  const listOfPrices = arr.map((e) => e.product.price * e.qty);
+  return listOfPrices.reduce((a, c) => a + c);
+};
+
 module.exports = {
   getOrders: (req, resp, next) => {
     const page = req.query.page || 1;
@@ -45,7 +50,7 @@ module.exports = {
   },
   addOrder: async (req, resp, next) => {
     const {
-      userId, products,
+      userId, products, total,
     } = req.body;
     if (!userId || !products) {
       return next(400);
@@ -53,7 +58,11 @@ module.exports = {
     if (!Array.isArray(products)) {
       return next(400);
     }
-    req.body.products = await getActualProduct(products);
+    const listOfProducts = await getActualProduct(products);
+    req.body.products = listOfProducts;
+    if (!total) {
+      req.body.total = getTotal(listOfProducts);
+    }
     const order = new Order(req.body);
     order.validateSync();
     try {
@@ -68,7 +77,7 @@ module.exports = {
       return next(400);
     }
     const { orderId } = req.params;
-    const { status, products } = req.body;
+    const { status, products, total } = req.body;
     if (status && status === 'delivered') {
       req.body.dateProcessed = Date.now();
     }
@@ -90,7 +99,11 @@ module.exports = {
         const newProducts = products.filter((element) => (
           !actualOrder.products.some((e) => String(e.product._id) === String(element.productId))
         ));
-        req.body.products = actualProducts.concat(await getActualProduct(newProducts));
+        const listOfProducts = actualProducts.concat(await getActualProduct(newProducts));
+        req.body.products = listOfProducts;
+        if (!total) {
+          req.body.total = getTotal(listOfProducts);
+        }
       }
       const doc = await Order.findOneAndUpdate({ _id: orderId }, req.body, {
         new: true,
