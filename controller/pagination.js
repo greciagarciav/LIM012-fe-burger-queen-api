@@ -3,10 +3,10 @@ const { port } = require('../config');
 module.exports.paginate = (req, page, limit, collection) => {
   const fullUrl = `<${req.protocol}://${req.hostname}${port}${req.path}`;
   let pagination = '';
-  if (parseInt(page, 10) !== 1) {
+  if (parseInt(page, 10) !== 1 && (collection.prevPage !== 1)) {
     pagination += `${fullUrl}?page=1&limit=${limit}>; rel="first",`;
   }
-  if (parseInt(page, 10) !== collection.totalPages) {
+  if ((parseInt(page, 10) !== collection.totalPages) && (collection.nextPage !== collection.totalPages)) {
     pagination += `${fullUrl}?page=${collection.totalPages}&limit=${limit}>; rel="last",`;
   }
   if (collection.hasNextPage) {

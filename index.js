@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { connectToDB } = require('./database/db-connect.js');
 const config = require('./config');
 const authMiddleware = require('./middleware/auth');
@@ -16,7 +17,7 @@ connectToDB(dbUrl);
 app.set('config', config);
 app.set('pkg', pkg);
 
-
+app.use(cors());
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
