@@ -8,7 +8,7 @@ exports.connectToDB = async (url) => {
       useCreateIndex: true,
       useNewUrlParser: true,
     });
-    console.log('db connected!');
+    console.log('db connected!', url);
   } catch (err) {
     console.log(err.message);
   }

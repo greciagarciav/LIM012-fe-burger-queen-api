@@ -1,19 +1,64 @@
-# Burger Queen - API con Node.js
+# Burger Queen - API with Node.js
 ![Frame 8](https://user-images.githubusercontent.com/58056552/89217742-49e66980-d592-11ea-9f9d-a08846777529.png) 
 
-API sevidor web con Node.js desarrollado junto con una serie de herramientas comunes usadas en este tipo de contexto: **Express** como
-framework, **MongoDB** como base datos, contenedores de **docker** y servidores
-virtuales como **EC2**.
+API built with Node.js, **Express** as the framework, **MongoDB** as the database, **Docker** for the containers and services
+like **EC2**
 
 ## Índice
 
+* [Local Set Up](#local-set-up)
 * [Endpoints](#api-endpoints)
 * [CLI](#cli)
 * [Deployment](#deployment)
 * [Objetivos de aprendizaje](#objetivos-de-aprendizaje)
 
+## Local Set Up
+[Mongo db installation guide](https://zellwk.com/blog/install-mongodb/) <br/>
+[Mongo db local connection guide](https://zellwk.com/blog/local-mongodb/) <br/>
+Install mongodb with brew
+```
+brew tap mongodb/brew
+brew install mongodb-community
+```
+You need to create a /data/db folder in System/Volumes/Data.
+```
+sudo mkdir -p /System/Volumes/Data/data/db
+sudo chown -R `id -un` /System/Volumes/Data/data/db
+```
+Run the service
+```
+brew services run mongodb-community
+```
+Access the Mongo shell
+```
+mongo
+```
+
+See the currently selected database with the db command
+
+```
+db
+```
+
+create a database called burger-queen. Use the use <database> command to create and switch to a new database.
+```
+use burger-queen
+```
+
+Access MongoDB with MongoDB Compass <br/>
+To connect to your local MongoDB, set Hostname to localhost and Port to 27017. <br/>
+These values are the default for all local MongoDB connections (unless you changed them).
+
+Finally run
+```
+npm i
+npm start
+```
+
+Sign with the admin user to start playing with the API.
+
 ## API Endpoints
-[Documentación guía de la clienta](https://laboratoria.github.io/burger-queen-api/)
+[Client Doc](https://laboratoria.github.io/burger-queen-api/)
 
 ### `/`
 
@@ -49,46 +94,33 @@ virtuales como **EC2**.
 
 ## CLI
 
-La aplicación cuente un comando **`npm start`**
-que se encarga de ejecutar la aplicación node y además puede
-recibir información de configuración, como el puerto en el que escuchar, a qué
-base datos conectarse, etc. Estos datos de configuración son distintos entre
-diferentes entornos (desarrollo, producción, ...).
-
+Start the app
+**`npm start`**
 ```sh
 # Arranca la aplicación el puerto 8888 usando npm
 npm start 8888
 ```
-La aplicación usa las siguientes **variables de entorno**:
+**ENVS**:
 
-* `PORT`: Si no se ha especificado un puerto como argumento de lína de comando,
-  se puede usar la variable de entorno `PORT` para especificar el puerto. Valor
-  por defecto `8080`.
-* `DB_URL`: El _string_ de conexión de _MongoDB_. En entorno de desarrollo se
-  utilizó una base de datos local, pero en producción se utilizan las instancias
-  configuradas con `docker-compose`.
-* `JWT_SECRET`: La aplicación implementa autenticación usando JWT (JSON
-   Web Tokens). Para poder firmar (cifrar) y verificar (descifrar) los tokens.
-* `ADMIN_EMAIL`: Opcionalmente se puede especificar un email y password para
-  el usuario admin (root). Si estos detalles están presentes la aplicación se
-  asegurará que exista el usuario y que tenga permisos de administrador. Valor
-  por defecto `admin@localhost`.
-* `ADMIN_PASSWORD`: Si hemos especificado un `ADMIN_EMAIL`, debemos pasar
-  también una contraseña para el usuario admin. Valor por defecto: `changeme`.
+* `PORT`: default value `8080`.
+* `DB_URL`: MongoDB conextion string.
+* `JWT_SECRET`: For authentication (JSON Web Tokens). To sign and verify tokens.
+* `ADMIN_EMAIL`: default value `admin@localhost`.
+* `ADMIN_PASSWORD`: deafult value `changeme`.
 
 ## Deployment
 
-La aplicación esta configurada con `docker-compose`, desplegada en la nube (VPS) con los servicios **EC2** de AWS quedando online y accesibles.
+Configure with `docker-compose` and deploy (VPS) with **EC2**.
 
 ## Objetivos de aprendizaje
 ### Node
 
-* [x] Instalar y usar modules
+* [x] Install and use modules
 * [x] `npm scripts`
 
 ### Express
 
-* [x] Rutas
+* [x] Routes
 * [x] `middlewares`
 
 ### HTTP
@@ -97,43 +129,43 @@ La aplicación esta configurada con `docker-compose`, desplegada en la nube (VPS
 * [x] Response
 * [x] Headers
 * [x] Body
-* [x] Verbos HTTP
-* [x] Codigos de status de HTTP
-* [x] Encodings y `JSON`
+* [x] HTTP Verbs
+* [x] HTTP status codes
+* [x] Encodings and `JSON`
 * [ ] CORS
 
 ### Autenticación
 
 * [x] `JWT`
-* [x] Cómo guardar y validar contraseñas
+* [x] How to save and validate passwords
 
 ### Testing
 
-* [x] Tests de integración
-* [x] Tests unitarios
+* [x] Integration tests
+* [x] Unit Tests
 
 ### Frontend Development
 
-* [x] Variables de entorno
+* [x] Environment variables
 * [x] `SSH`
 * [x] `SSH` keys
-* [x] Qué es un VPS
+* [x] VPS
 
-### MongoDB o MySQL (según corresponda)
+### MongoDB
 
-* [x] Instalación
-* [x] Conexión a través de cliente
+* [x] Installation
+* [x] Connection with client
 * [x] Connection string
-* [x] Comandos/Queries de creacion, lectura, modificación y eliminación
+* [x] Commands/Queries CRUD
 
 ### Deployment
 
-* [x] Contenedores
-* [x] Qué es Docker
-* [x] Qué es Docker compose
-* [x] Uso de `docker-compose`
+* [x] Containers
+* [x] Docker
+* [x] Docker compose
+* [x] `docker-compose` usage
 
-### Colaboración y Organización con Git y Github
+### Organization and Collaboration with Git and Github
 
 * [x] Forks
 * [x] Branches
@@ -144,8 +176,8 @@ La aplicación esta configurada con `docker-compose`, desplegada en la nube (VPS
 * [x] Labels
 * [x] Milestones
 
-### Buenas prácticas de desarrollo
+### Good Practices
 
-* [x] Modularización
-* [x] Nomenclatura / Semántica
+* [x] Modules
+* [x] Naming and coding conventions
 * [x] Linting
