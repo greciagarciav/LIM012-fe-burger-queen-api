@@ -10,7 +10,7 @@ like **EC2**
 * [Endpoints](#api-endpoints)
 * [CLI](#cli)
 * [Deployment](#deployment)
-* [Objetivos de aprendizaje](#objetivos-de-aprendizaje)
+* [Learning goals](#learning-goals)
 
 ## Local Set Up
 [Mongo db installation guide](https://zellwk.com/blog/install-mongodb/) <br/>
@@ -40,7 +40,7 @@ See the currently selected database with the db command
 db
 ```
 
-create a database called burger-queen. Use the use <database> command to create and switch to a new database.
+create a database called burger-queen. Use the 'use' command to create and switch to a new database.
 ```
 use burger-queen
 ```
@@ -95,9 +95,7 @@ Sign with the admin user to start playing with the API.
 ## CLI
 
 Start the app
-**`npm start`**
 ```sh
-# Arranca la aplicación el puerto 8888 usando npm
 npm start 8888
 ```
 **ENVS**:
@@ -112,7 +110,7 @@ npm start 8888
 
 Configure with `docker-compose` and deploy (VPS) with **EC2**.
 
-## Objetivos de aprendizaje
+## Learning Goals
 ### Node
 
 * [x] Install and use modules
