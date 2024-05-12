@@ -5,7 +5,6 @@ exports.connectToDB = async (url) => {
   try {
     await mongoose.connect(url, {
       useUnifiedTopology: true,
-      useCreateIndex: true,
       useNewUrlParser: true,
     });
     console.log('db connected!', url);

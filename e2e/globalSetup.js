@@ -100,7 +100,7 @@ const waitForServerToBeReady = (retries = 10) => new Promise((resolve, reject) =
           : resolve()
       ))
       .catch(() => waitForServerToBeReady(retries - 1).then(resolve, reject));
-  }, 5000);
+  }, 10000);
 });
 
 
